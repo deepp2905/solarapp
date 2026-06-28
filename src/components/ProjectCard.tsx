@@ -11,18 +11,17 @@ export default function ProjectCard({ project }: { project: Project }) {
     <Link to={`/project/${project.id}`} className="project-card">
       <div className="project-card-top">
         <StatusBadge status={project.status} />
-        <span className="type-chip">{project.type}</span>
       </div>
 
       <div className="project-card-body">
-        <h3 className="project-card-name">{project.name}</h3>
+        <div className="project-card-titlerow">
+          <h3 className="project-card-name">{project.name}</h3>
+          <span className="type-chip">{project.type}</span>
+        </div>
         <p className="project-card-address">{project.address}</p>
       </div>
 
       <div className="project-card-progress">
-        <span className="project-card-count">
-          {done} / {total}
-        </span>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
         </div>

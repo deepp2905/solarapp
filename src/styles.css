@@ -312,7 +312,6 @@ body {
 .override-hint,
 .alert-text,
 .projects-import,
-.project-card-count,
 .project-card-pct,
 .footer-copy {
   font-size: var(--fs-caption);
@@ -1323,7 +1322,15 @@ a {
   gap: 5px;
 }
 
+.project-card-titlerow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .project-card-name {
+  flex: 1;
+  min-width: 0;
   color: var(--text);
   margin: 0;
 }
@@ -1338,12 +1345,6 @@ a {
   align-items: center;
   gap: 12px;
   padding-top: 2px;
-}
-
-.project-card-count {
-  flex: none;
-  color: var(--color-text-secondary);
-  font-weight: var(--fw-semibold);
 }
 
 .project-card-pct {
@@ -1364,13 +1365,11 @@ a {
   padding: 3px 8px;
 }
 
-/* Status badge (dot + label), tinted per status */
+/* Status indicator — bare label (dot only for in-progress), tinted per status */
 .status-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: 999px;
-  padding: 4px 10px 4px 8px;
   font-size: var(--fs-overline);
   line-height: var(--lh-overline);
   font-weight: var(--fw-semibold);
@@ -1385,18 +1384,15 @@ a {
 }
 
 .status-badge--in-progress {
-  background: var(--color-brand-wash);
   color: var(--color-brand-strong);
 }
 
 .status-badge--complete {
-  background: var(--color-success-bg);
   color: var(--color-success-text);
 }
 
 .status-badge--not-started {
-  background: var(--color-surface-sunken);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
 }
 
 .projects-empty {
