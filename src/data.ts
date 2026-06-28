@@ -253,28 +253,55 @@ function buildSectionsWithExtra(): Section[] {
   return sections;
 }
 
-export const PROJECTS: Project[] = [
-  {
-    id: "sample-project",
-    name: "Sample Project",
-    address: "350 California Street, San Francisco, CA",
-    type: "PV",
-    ahj: "City of Santa Clara",
-    status: "not-started",
-    gpsToleranceMi: 0.1,
-    sections: buildSections(),
-  },
-  {
-    id: "sample-project-2",
-    name: "Sample Project 2",
-    address: "350 Mission Street, San Francisco, CA",
-    type: "ST",
-    ahj: "City of Milpitas",
-    status: "not-started",
-    gpsToleranceMi: 0.1,
-    sections: buildSectionsWithExtra(),
-  },
+// Demo project definitions. `sections` is built per project so each owns an
+// independent checklist; `buildSectionsWithExtra` gives one a differing count.
+interface ProjectSeed {
+  id: string;
+  name: string;
+  address: string;
+  type: string;
+  ahj: string;
+  status: ProjectStatus;
+  withExtra?: boolean;
+}
+
+const PROJECT_SEEDS: ProjectSeed[] = [
+  { id: "sample-project", name: "Sample Project", address: "350 California Street, San Francisco, CA", type: "ST", ahj: "City of Santa Clara", status: "in-progress" },
+  { id: "mission-st-retrofit", name: "Mission St Retrofit", address: "350 Mission Street, San Francisco, CA", type: "ST", ahj: "City of Milpitas", status: "in-progress", withExtra: true },
+  { id: "harborview-solar", name: "Harborview Solar", address: "88 Embarcadero, San Francisco, CA", type: "PV", ahj: "City of Oakland", status: "in-progress" },
+  { id: "redwood-commons", name: "Redwood Commons", address: "1200 Broadway, Redwood City, CA", type: "PV", ahj: "City of Santa Clara", status: "complete" },
+  { id: "sunset-ridge", name: "Sunset Ridge", address: "45 Ocean Ave, San Francisco, CA", type: "ST", ahj: "City of San Jose", status: "complete" },
+  { id: "lakeside-array", name: "Lakeside Array", address: "9 Lakeshore Dr, Oakland, CA", type: "PV", ahj: "City of Oakland", status: "complete" },
+  { id: "summit-battery", name: "Summit Battery", address: "500 Summit Rd, San Jose, CA", type: "ST", ahj: "City of San Jose", status: "complete" },
+  { id: "bayfront-install", name: "Bayfront Install", address: "12 Bay St, Milpitas, CA", type: "PV", ahj: "City of Milpitas", status: "not-started" },
 ];
+
+export const PROJECTS: Project[] = PROJECT_SEEDS.map(
+  ({ withExtra, ...seed }) => ({
+    ...seed,
+    gpsToleranceMi: 0.1,
+    sections: withExtra ? buildSectionsWithExtra() : buildSections(),
+  })
+);
+
+export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
+  complete: "Complete",
+  "in-progress": "In progress",
+  "not-started": "Not started",
+};
+
+/** Counts of projects per status, in display order (complete → in-progress → not-started). */
+export function projectStatusCounts(
+  projects: Project[] = PROJECTS
+): { status: ProjectStatus; count: number }[] {
+  const order: ProjectStatus[] = ["complete", "in-progress", "not-started"];
+  return order
+    .map((status) => ({
+      status,
+      count: projects.filter((p) => p.status === status).length,
+    }))
+    .filter((s) => s.count > 0);
+}
 
 export function findProject(id: string): Project | undefined {
   return PROJECTS.find((p) => p.id === id);

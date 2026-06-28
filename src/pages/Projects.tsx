@@ -1,78 +1,52 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PROJECTS } from "../data";
+import ProjectsHeader from "../components/ProjectsHeader";
+import ProjectFilters from "../components/ProjectFilters";
 import ProjectCard from "../components/ProjectCard";
-import { IconChevron, IconSearch } from "../components/Icon";
 
 export default function Projects() {
   const [query, setQuery] = useState("");
+  const [ahj, setAhj] = useState("all");
 
-  const filtered = PROJECTS.filter((p) => {
+  const jurisdictions = useMemo(
+    () => [...new Set(PROJECTS.map((p) => p.ahj))].sort(),
+    []
+  );
+
+  const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      p.name.toLowerCase().includes(q) ||
-      p.address.toLowerCase().includes(q) ||
-      p.ahj.toLowerCase().includes(q)
-    );
-  });
+    return PROJECTS.filter((p) => {
+      const matchesAhj = ahj === "all" || p.ahj === ahj;
+      const matchesQuery =
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.address.toLowerCase().includes(q) ||
+        p.ahj.toLowerCase().includes(q);
+      return matchesAhj && matchesQuery;
+    });
+  }, [query, ahj]);
 
   return (
     <main className="page">
-      <h1 className="page-title">Projects</h1>
+      <ProjectsHeader projects={PROJECTS} />
 
-      <div className="projects-toolbar">
-        <span className="projects-count">
-          {PROJECTS.length} project{PROJECTS.length === 1 ? "" : "s"}
-        </span>
-        <div className="projects-add">
-          <button type="button" className="btn-solid">
-            Add project
-          </button>
-          <span className="projects-import">
-            Import by SolarAPP+ ID? Connect your integration
-          </span>
+      <ProjectFilters
+        query={query}
+        onQueryChange={setQuery}
+        ahj={ahj}
+        onAhjChange={setAhj}
+        jurisdictions={jurisdictions}
+      />
+
+      {filtered.length > 0 ? (
+        <div className="projects-grid">
+          {filtered.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
         </div>
-      </div>
-
-      <div className="filters">
-        <label className="field field-grow">
-          <span className="field-label">Search</span>
-          <span className="input-wrap">
-            <IconSearch className="input-icon" />
-            <input
-              className="input"
-              type="search"
-              placeholder="Title, address, permit number, or SolarAPP ID"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </span>
-        </label>
-
-        <label className="field field-ahj">
-          <span className="field-label">Jurisdiction (AHJ)</span>
-          <span className="input-wrap">
-            <select className="input select" defaultValue="all">
-              <option value="all">All jurisdictions</option>
-              {[...new Set(PROJECTS.map((p) => p.ahj))].map((ahj) => (
-                <option key={ahj} value={ahj}>
-                  {ahj}
-                </option>
-              ))}
-            </select>
-            <IconChevron className="input-icon input-icon-right select-caret" />
-          </span>
-        </label>
-      </div>
-
-      <div className="projects-list">
-        {filtered.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
-        {filtered.length === 0 && (
-          <p className="projects-empty">No projects match “{query}”.</p>
-        )}
-      </div>
+      ) : (
+        <p className="projects-empty">No projects match your filters.</p>
+      )}
     </main>
   );
 }
