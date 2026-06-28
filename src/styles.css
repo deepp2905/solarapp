@@ -1,10 +1,14 @@
 :root {
-  --bg: #f7f8fa;
+  --bg: #f9fafb;
   --card: #ffffff;
-  --border: #eaecef;
-  --text: #1a2230;
-  --muted: #6b7480;
-  --accent: #f59e0b;
+  --border: #e5e7eb;
+  --border-soft: #f3f4f6;
+  --text: #101828;
+  --text-2: #4a5565;
+  --muted: #6a7282;
+  --brand: #f79120;
+  --brand-dark: #a85e0a;
+  --accent: #f79120;
   --tan: #c9a06a;
   --green: #16a34a;
   --blue: #2563eb;
@@ -23,8 +27,8 @@ body {
   background: var(--bg);
   min-height: 100vh;
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: "Instrument Sans", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 button {
@@ -37,9 +41,153 @@ a {
 }
 
 .page {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px 80px;
+  padding: 32px 32px 80px;
+}
+
+/* ---------- Top nav (global) ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--brand);
+  flex: none;
+}
+.nav-logo-mark {
+  width: 20px;
+  height: 20px;
+}
+.nav-title {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 16px;
+}
+.nav-pill {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.nav-pill-active {
+  background: var(--border-soft);
+}
+.nav-pill:hover {
+  background: var(--border-soft);
+}
+.nav-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.nav-user:hover {
+  background: var(--border-soft);
+}
+.nav-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--border);
+  color: #364153;
+  font-size: 12px;
+  font-weight: 600;
+  flex: none;
+}
+.nav-user-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.25;
+}
+.nav-user-name {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+.nav-user-company {
+  color: var(--muted);
+  font-size: 12px;
+}
+.nav-user-caret {
+  width: 16px;
+  height: 16px;
+  color: #9aa3af;
+  transform: rotate(180deg); /* shared chevron points up; design points down */
+  flex: none;
+}
+
+/* ---------- Project header (sticky, below nav) ---------- */
+.project-header {
+  position: sticky;
+  top: 64px;
+  z-index: 10;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  margin: -32px -32px 24px;
+  padding: 24px 32px 16px;
+}
+.project-name {
+  font-family: "Roboto", system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  margin: 0;
+}
+.project-header .project-address {
+  color: var(--text-2);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+.project-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+.project-header .progress-wrap {
+  flex: 1;
+  max-width: 448px;
 }
 
 /* ---------- Status icons ---------- */
@@ -61,68 +209,47 @@ a {
   color: var(--error);
 }
 
-/* ---------- Checklist header ---------- */
-.checklist-header {
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 28px 0 24px;
-}
-.checklist-header-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-.project-title {
-  font-size: 30px;
-  font-weight: 700;
-  margin: 0;
-}
-.project-address {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 6px 0 0;
-}
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: 22px;
-}
+/* ---------- Progress bar (shared) ---------- */
 .progress-wrap {
   display: flex;
   align-items: center;
-  gap: 14px;
-  flex: 1;
+  gap: 12px;
 }
 .progress-track {
   position: relative;
-  height: 7px;
-  background: #e7e9ee;
-  border-radius: 99px;
+  height: 8px;
+  background: var(--border);
+  border-radius: 999px;
   flex: 1;
-  max-width: 420px;
   overflow: hidden;
 }
 .progress-fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: var(--accent);
-  border-radius: 99px;
+  background: var(--brand);
+  border-radius: 999px;
 }
 .progress-count {
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--muted);
+  font-feature-settings: "tnum";
   white-space: nowrap;
+  flex: none;
 }
 .review-btn {
-  background: var(--tan);
+  background: var(--brand-dark);
   color: #fff;
-  border: none;
+  border: 1px solid var(--brand-dark);
   border-radius: 8px;
-  padding: 12px 22px;
-  font-size: 15px;
-  font-weight: 600;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  flex: none;
+}
+.review-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---------- Sections ---------- */
@@ -228,7 +355,7 @@ a {
   gap: 8px;
   font-size: 14px;
   color: var(--muted);
-  padding: 26px 0 18px;
+  padding: 0 0 18px;
 }
 .breadcrumb a:hover {
   color: var(--text);

@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  CAPTURED_ITEMS,
-  PROJECT,
-  SECTIONS,
-  TOTAL_ITEMS,
-} from "../data";
+import { CAPTURED_ITEMS, PROJECT, SECTIONS, TOTAL_ITEMS } from "../data";
 import StatusIcon from "../components/StatusIcon";
+import ProjectHeader from "../components/ProjectHeader";
 import { IconChevron } from "../components/Icon";
 
 export default function Checklist() {
@@ -16,30 +12,15 @@ export default function Checklist() {
     setCollapsed((c) => ({ ...c, [id]: !c[id] }));
 
   return (
-    <>
-      <header className="checklist-header">
-        <div className="checklist-header-inner">
-          <h1 className="project-title">{PROJECT.name}</h1>
-          <p className="project-address">{PROJECT.address}</p>
-          <div className="header-row">
-            <div className="progress-wrap">
-              <div className="progress-track">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${(CAPTURED_ITEMS / TOTAL_ITEMS) * 100}%` }}
-                />
-              </div>
-              <span className="progress-count">
-                {CAPTURED_ITEMS}/{TOTAL_ITEMS}
-              </span>
-            </div>
-            <button className="review-btn">Review &amp; Sign Off</button>
-          </div>
-        </div>
-      </header>
+    <main className="page">
+      <ProjectHeader
+        name={PROJECT.name}
+        address={PROJECT.address}
+        completed={CAPTURED_ITEMS}
+        total={TOTAL_ITEMS}
+      />
 
-      <main className="page">
-        <div className="sections">
+      <div className="sections">
           {SECTIONS.map((section) => {
             const done = section.items.filter(
               (i) => i.status === "captured"
@@ -92,8 +73,7 @@ export default function Checklist() {
               </div>
             );
           })}
-        </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
