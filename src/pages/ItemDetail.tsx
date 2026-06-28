@@ -102,7 +102,6 @@ export default function ItemDetail() {
             <EvidenceCard
               key={ev.fileName + i}
               evidence={ev}
-              gpsToleranceMi={project.gpsToleranceMi}
               onDelete={() =>
                 setEvidence((list) => list.filter((_, j) => j !== i))
               }
