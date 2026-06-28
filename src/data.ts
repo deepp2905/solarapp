@@ -9,6 +9,8 @@ export interface Evidence {
   gps: GpsStatus;
   /** distance from site in miles, when GPS is available */
   distanceMi?: number;
+  /** thumbnail image URL; falls back to a placeholder when absent */
+  thumbnailUrl?: string;
   /** override note supplied by the installer when GPS failed */
   overrideNote?: string;
 }
@@ -28,12 +30,21 @@ export interface Section {
   items: ChecklistItem[];
 }
 
-export const PROJECT = {
-  name: "Sample Project",
-  address: "350 California Street, San Francisco, CA",
+export type ProjectStatus = "not-started" | "in-progress" | "complete";
+
+export interface Project {
+  id: string;
+  name: string;
+  address: string;
+  /** short badge, e.g. "PV" or "ST" */
+  type: string;
+  /** authority having jurisdiction */
+  ahj: string;
+  status: ProjectStatus;
   /** GPS tolerance: a photo must be within this many miles of the site */
-  gpsToleranceMi: 0.1,
-};
+  gpsToleranceMi: number;
+  sections: Section[];
+}
 
 // kebab-case slug from a title
 const slug = (s: string) =>
@@ -52,15 +63,37 @@ function item(
   return { id: slug(title), title, subtitle, status: "to-capture", ...extra };
 }
 
-export const SECTIONS: Section[] = [
+// The standard SolarAPP+ checklist. Built fresh per project so each project
+// owns an independent copy of its items (capture state is per-project).
+function buildSections(): Section[] {
+  return [
   {
     id: "site-overview",
     title: "Site Overview",
     items: [
       item(
         "Site Address",
-        "Photo of the property address or street sign confirming the install location.",
-        { status: "captured", filesCaptured: 1 }
+        "Capture from the street or driveway for address + front view. Ensure the address number is legible and the full building facade is in frame.",
+        {
+          status: "captured",
+          filesCaptured: 2,
+          evidence: [
+            {
+              fileName: "CTD Thumbnail.png",
+              displayName: "CTD Thumbnail.png",
+              ready: true,
+              gps: "failed",
+              distanceMi: 32.6,
+            },
+            {
+              fileName: "Bank Onboarding Thumbnail.png",
+              displayName: "Bank Onboarding Thumbnail.png",
+              ready: true,
+              gps: "failed",
+              distanceMi: 41.8,
+            },
+          ],
+        }
       ),
       item(
         "Roof Overview",
@@ -195,26 +228,73 @@ export const SECTIONS: Section[] = [
     ],
   },
   {
-    id: "system-tests",
-    title: "System Tests",
-    items: [
-      item(
-        "Power Control System Test",
-        "Documentation or photo evidence of the power control system test."
-      ),
-    ],
+      id: "system-tests",
+      title: "System Tests",
+      items: [
+        item(
+          "Power Control System Test",
+          "Documentation or photo evidence of the power control system test."
+        ),
+      ],
+    },
+  ];
+}
+
+// Second project has one extra item so its count differs (1/34 vs 1/33).
+function buildSectionsWithExtra(): Section[] {
+  const sections = buildSections();
+  const systemTests = sections.find((s) => s.id === "system-tests");
+  systemTests?.items.push(
+    item(
+      "Battery System Test",
+      "Documentation or photo evidence of the battery system test."
+    )
+  );
+  return sections;
+}
+
+export const PROJECTS: Project[] = [
+  {
+    id: "sample-project",
+    name: "Sample Project",
+    address: "350 California Street, San Francisco, CA",
+    type: "PV",
+    ahj: "City of Santa Clara",
+    status: "not-started",
+    gpsToleranceMi: 0.1,
+    sections: buildSections(),
+  },
+  {
+    id: "sample-project-2",
+    name: "Sample Project 2",
+    address: "350 Mission Street, San Francisco, CA",
+    type: "ST",
+    ahj: "City of Milpitas",
+    status: "not-started",
+    gpsToleranceMi: 0.1,
+    sections: buildSectionsWithExtra(),
   },
 ];
 
-export const FLAT_ITEMS = SECTIONS.flatMap((s) => s.items);
-export const TOTAL_ITEMS = FLAT_ITEMS.length;
-export const CAPTURED_ITEMS = FLAT_ITEMS.filter(
-  (i) => i.status === "captured"
-).length;
+export function findProject(id: string): Project | undefined {
+  return PROJECTS.find((p) => p.id === id);
+}
 
-export function findItem(id: string) {
-  for (const section of SECTIONS) {
-    const it = section.items.find((i) => i.id === id);
+export function flatItems(project: Project): ChecklistItem[] {
+  return project.sections.flatMap((s) => s.items);
+}
+
+export function totalItems(project: Project): number {
+  return flatItems(project).length;
+}
+
+export function capturedItems(project: Project): number {
+  return flatItems(project).filter((i) => i.status === "captured").length;
+}
+
+export function findItem(project: Project, itemId: string) {
+  for (const section of project.sections) {
+    const it = section.items.find((i) => i.id === itemId);
     if (it) return { section, item: it };
   }
   return null;

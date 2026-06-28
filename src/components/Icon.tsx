@@ -2,6 +2,32 @@
 // sprite-loading / file:// concern under Vite.
 type Props = { className?: string };
 
+export const IconChevronRight = ({ className }: Props) => (
+  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="m9 18 6-6-6-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const IconSearch = ({ className }: Props) => (
+  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
+    <path
+      d="m20 20-3.5-3.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 export const IconDashed = ({ className }: Props) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
     <circle

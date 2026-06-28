@@ -1,12 +1,13 @@
 import { useState } from "react";
 import type { Evidence } from "../data";
-import { PROJECT } from "../data";
-import { IconGpsOff, IconPin, IconTrash } from "./Icon";
+import { IconGpsOff, IconTrash } from "./Icon";
 
 const MIN_NOTE = 10;
 
 interface Props {
   evidence: Evidence;
+  /** GPS tolerance for this project, in miles */
+  gpsToleranceMi: number;
   onDelete?: () => void;
   onSaveOverride?: (note: string) => void;
 }
@@ -17,6 +18,7 @@ interface Props {
  */
 export default function EvidenceCard({
   evidence,
+  gpsToleranceMi,
   onDelete,
   onSaveOverride,
 }: Props) {
@@ -26,21 +28,7 @@ export default function EvidenceCard({
   const gpsFailed = evidence.gps === "failed";
   const resolved = Boolean(evidence.overrideNote);
   const noteValid = note.trim().length >= MIN_NOTE;
-
-  // Status reflects the *unresolved* failure: only "Ready" once resolved.
-  const statusPill =
-    gpsFailed && !resolved ? (
-      <span className="pill pill-error">
-        <IconGpsOff className="pill-icon" /> Action needed
-      </span>
-    ) : (
-      <span className="pill pill-ok">Ready</span>
-    );
-
-  const distanceLabel =
-    evidence.distanceMi !== undefined
-      ? `${evidence.distanceMi} mi from site (tolerance ${PROJECT.gpsToleranceMi} mi)`
-      : null;
+  const unresolved = gpsFailed && !resolved;
 
   function handleDelete() {
     if (window.confirm("Delete this photo? This can't be undone.")) {
@@ -55,36 +43,52 @@ export default function EvidenceCard({
   }
 
   return (
-    <div className={`evidence-card${gpsFailed && !resolved ? " is-error" : ""}`}>
+    <div className={`evidence-card${unresolved ? " is-error" : ""}`}>
       <div className="evidence-card-head">
-        <div className="evidence-thumb">IMG</div>
+        <div
+          className="evidence-thumb"
+          style={
+            evidence.thumbnailUrl
+              ? { backgroundImage: `url(${evidence.thumbnailUrl})` }
+              : undefined
+          }
+        >
+          {!evidence.thumbnailUrl && "IMG"}
+        </div>
 
         <div className="evidence-info">
-          <div className="evidence-name">{evidence.displayName}</div>
+          <div className="evidence-info-top">
+            <span className="evidence-name">{evidence.displayName}</span>
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="Delete photo"
+              title="Delete photo"
+              onClick={handleDelete}
+            >
+              <IconTrash className="icon-16" />
+            </button>
+          </div>
+
           <div className="evidence-pills">
-            {statusPill}
+            <span className="pill pill-ok">
+              {resolved ? "Ready" : gpsFailed ? "Captured" : "Ready"}
+            </span>
             {gpsFailed && (
               <span className="pill pill-error-soft">
-                <IconGpsOff className="pill-icon" /> GPS failed
+                <IconGpsOff className="pill-icon" /> GPS Failed
               </span>
             )}
-            {distanceLabel && (
-              <span className="evidence-meta">{distanceLabel}</span>
+            {evidence.distanceMi !== undefined && (
+              <span className="pill pill-error-soft">
+                {evidence.distanceMi} mi from site
+              </span>
             )}
           </div>
         </div>
-
-        <button
-          type="button"
-          className="icon-btn"
-          aria-label="Delete photo"
-          title="Delete photo"
-          onClick={handleDelete}
-        >
-          <IconTrash className="icon-18" />
-        </button>
       </div>
 
+      {/* Resolved: show the saved note + edit affordance */}
       {gpsFailed && resolved && !editing && (
         <div className="evidence-foot resolved">
           <div className="override-saved">
@@ -100,22 +104,24 @@ export default function EvidenceCard({
         </div>
       )}
 
-      {gpsFailed && !resolved && !editing && (
+      {/* Unresolved: red call-to-action that opens the override form */}
+      {unresolved && !editing && (
         <div className="evidence-foot">
-          <div className="alert-text">
-            <IconPin className="icon-14" />
-            GPS check failed — a documented reason is required before sign-off.
-          </div>
           <button
             type="button"
-            className="btn btn-primary btn-sm"
+            className="gps-fail-btn"
             onClick={() => setEditing(true)}
           >
-            Add override note
+            <IconGpsOff className="icon-16" />
+            GPS Check Failed — Documentation Required
           </button>
+          <span className="evidence-meta">
+            within {gpsToleranceMi} mi required
+          </span>
         </div>
       )}
 
+      {/* Override form */}
       {editing && (
         <div className="evidence-foot column">
           <label className="override-label" htmlFor="override-note">
@@ -132,7 +138,7 @@ export default function EvidenceCard({
           <div className="override-actions">
             <button
               type="button"
-              className="btn btn-primary btn-sm"
+              className="btn btn-take btn-sm"
               disabled={!noteValid}
               onClick={handleSave}
             >
