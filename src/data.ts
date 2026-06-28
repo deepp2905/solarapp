@@ -1,11 +1,41 @@
-// Single source of truth for the checklist.
-// status: "captured" | "to-capture" | "warning" | "error"
-window.PROJECT = {
+export type ItemStatus = "captured" | "to-capture" | "warning" | "error";
+
+export type GpsStatus = "ok" | "failed" | "none";
+
+export interface Evidence {
+  fileName: string;
+  displayName: string;
+  ready: boolean;
+  gps: GpsStatus;
+  /** distance from site in miles, when GPS is available */
+  distanceMi?: number;
+  /** override note supplied by the installer when GPS failed */
+  overrideNote?: string;
+}
+
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  status: ItemStatus;
+  filesCaptured?: number;
+  evidence?: Evidence[];
+}
+
+export interface Section {
+  id: string;
+  title: string;
+  items: ChecklistItem[];
+}
+
+export const PROJECT = {
   name: "Sample Project 2",
   address: "350 Mission Street, San Francisco, CA",
+  /** GPS tolerance: a photo must be within this many miles of the site */
+  gpsToleranceMi: 0.1,
 };
 
-window.SECTIONS = [
+export const SECTIONS: Section[] = [
   {
     id: "site-overview",
     title: "Site Overview",
@@ -23,7 +53,16 @@ window.SECTIONS = [
         title: "Electrical Diagram",
         subtitle:
           "Single-line electrical diagram showing the system layout and connections.",
-        status: "to-capture",
+        status: "error",
+        evidence: [
+          {
+            fileName: "CTD Thumbnail.png",
+            displayName: "CTD Thumbnail.png",
+            ready: true,
+            gps: "failed",
+            distanceMi: 0.3,
+          },
+        ],
       },
       {
         id: "site-walkthrough",
@@ -116,31 +155,42 @@ window.SECTIONS = [
   },
 ];
 
-// --- derived helpers ---
-window.FLAT_ITEMS = window.SECTIONS.flatMap((s) => s.items);
-window.TOTAL_ITEMS = window.FLAT_ITEMS.length;
-window.CAPTURED_ITEMS = window.FLAT_ITEMS.filter(
+export const FLAT_ITEMS = SECTIONS.flatMap((s) => s.items);
+export const TOTAL_ITEMS = FLAT_ITEMS.length;
+export const CAPTURED_ITEMS = FLAT_ITEMS.filter(
   (i) => i.status === "captured"
 ).length;
 
-window.findItem = function (id) {
-  for (const section of window.SECTIONS) {
+export function findItem(id: string) {
+  for (const section of SECTIONS) {
     const item = section.items.find((i) => i.id === id);
     if (item) return { section, item };
   }
   return null;
-};
+}
 
-// Map a status to the sprite icon id + a CSS class for color.
-window.statusIcon = function (status) {
+export function statusIconId(status: ItemStatus): string {
   switch (status) {
     case "captured":
-      return { icon: "icon-check", cls: "status-captured" };
+      return "icon-check";
     case "warning":
-      return { icon: "icon-warning", cls: "status-warning" };
+      return "icon-warning";
     case "error":
-      return { icon: "icon-error", cls: "status-error" };
+      return "icon-error";
     default:
-      return { icon: "icon-dashed", cls: "status-pending" };
+      return "icon-dashed";
   }
-};
+}
+
+export function statusClass(status: ItemStatus): string {
+  switch (status) {
+    case "captured":
+      return "status-captured";
+    case "warning":
+      return "status-warning";
+    case "error":
+      return "status-error";
+    default:
+      return "status-pending";
+  }
+}

@@ -349,3 +349,219 @@ a {
 .detail-nav .muted {
   color: var(--muted);
 }
+
+/* ---------- Generic icon sizes ---------- */
+.icon-14 {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.icon-16 {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.icon-18 {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+/* ---------- Badges (checklist rows) ---------- */
+.badge-error {
+  color: var(--error);
+  background: #fdecec;
+}
+
+/* ---------- Evidence list / cards ---------- */
+.evidence-list {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.evidence-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.evidence-card.is-error {
+  border-color: #f3c5c5;
+}
+.evidence-card-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+}
+.evidence-thumb {
+  width: 56px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-size: 11px;
+  color: var(--muted);
+  flex: none;
+}
+.evidence-info {
+  flex: 1;
+  min-width: 0;
+}
+.evidence-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+}
+.evidence-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.evidence-meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Pills ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.pill-icon {
+  width: 13px;
+  height: 13px;
+}
+.pill-ok {
+  color: #0f7a4f;
+  background: #e3f6ec;
+}
+.pill-error {
+  color: #fff;
+  background: var(--error);
+}
+.pill-error-soft {
+  color: var(--error);
+  background: #fdecec;
+}
+
+/* ---------- Icon button (delete) ---------- */
+.icon-btn {
+  border: none;
+  background: none;
+  color: var(--muted);
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  flex: none;
+}
+.icon-btn:hover {
+  color: var(--error);
+  background: #fdecec;
+}
+
+/* ---------- Evidence footer / override ---------- */
+.evidence-foot {
+  border-top: 1px solid var(--border);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.evidence-foot.column {
+  flex-direction: column;
+  align-items: stretch;
+}
+.evidence-foot.resolved {
+  background: #f6fbf8;
+}
+.alert-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--error);
+}
+.override-saved {
+  font-size: 13.5px;
+  color: var(--text);
+}
+.override-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.override-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  color: var(--text);
+}
+.override-input:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+  border-color: var(--blue);
+}
+.override-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.override-hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Buttons (shared) ---------- */
+.btn:focus-visible,
+.btn-ghost:focus-visible,
+.icon-btn:focus-visible,
+.btn-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.btn-sm {
+  padding: 9px 16px;
+  font-size: 14px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-ghost {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 9px 16px;
+}
+.btn-ghost:hover {
+  background: #f6f7f9;
+}
+.btn-link {
+  border: none;
+  background: none;
+  color: var(--blue);
+  font-weight: 600;
+  font-size: 14px;
+}

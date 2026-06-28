@@ -4,31 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Solar Checklist</title>
-    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="checklist-header">
-      <div class="checklist-header-inner">
-        <h1 class="project-title" id="project-name"></h1>
-        <p class="project-address" id="project-address"></p>
-        <div class="header-row">
-          <div class="progress-wrap">
-            <div class="progress-track">
-              <div class="progress-fill" id="progress-fill"></div>
-            </div>
-            <span class="progress-count" id="progress-count"></span>
-          </div>
-          <button class="review-btn">Review &amp; Sign Off</button>
-        </div>
-      </div>
-    </header>
-
-    <main class="page">
-      <div class="sections" id="sections"></div>
-    </main>
-
-    <script src="data.js"></script>
-    <script src="icons.js"></script>
-    <script src="checklist.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
