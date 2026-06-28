@@ -1,19 +1,139 @@
 :root {
-  --bg: #f9fafb;
-  --card: #ffffff;
-  --border: #e5e7eb;
-  --border-soft: #f3f4f6;
-  --text: #101828;
-  --text-2: #4a5565;
-  --muted: #6a7282;
-  --brand: #f79120;
-  --brand-dark: #a85e0a;
-  --accent: #f79120;
-  --tan: #c9a06a;
-  --green: #16a34a;
-  --blue: #2563eb;
-  --warn: #f59e0b;
-  --error: #dc2626;
+  /* ============================================================
+     TIER 1 — Raw palette. The ONLY place hex literals live.
+     Swap a ramp here to reskin everything that maps to it.
+     ============================================================ */
+
+  /* Primary — Solar Amber */
+  --amber-50: #fff6ec;
+  --amber-100: #fde7cc;
+  --amber-200: #fbcf9e;
+  --amber-300: #fab36a;
+  --amber-400: #f89e40;
+  --amber-500: #f79120;
+  --amber-600: #de7a12;
+  --amber-700: #b45f0e;
+  --amber-800: #8a4a12;
+  --amber-900: #5f3410;
+
+  /* Neutrals — Warm Gray */
+  --gray-50: #faf9f7;
+  --gray-100: #f4f2ef;
+  --gray-200: #e8e4df;
+  --gray-300: #d6d0c8;
+  --gray-400: #b4aba0;
+  --gray-500: #918778;
+  --gray-600: #6e655a;
+  --gray-700: #524a41;
+  --gray-800: #36302a;
+  --gray-900: #1f1b17;
+
+  /* Success — Green */
+  --green-50: #e9f7ef;
+  --green-100: #c9edd7;
+  --green-300: #66c68f;
+  --green-500: #1f9d5b;
+  --green-600: #16804a;
+  --green-700: #11633a;
+  --green-900: #0a3a23;
+
+  /* Warning — Amber Gold */
+  --gold-50: #fef7e6;
+  --gold-100: #fcebbf;
+  --gold-300: #f5c13d;
+  --gold-500: #d99a0a;
+  --gold-600: #b37e08;
+  --gold-700: #8c6206;
+  --gold-900: #523a09;
+
+  /* Error — Red */
+  --red-50: #fdecec;
+  --red-100: #fad1d1;
+  --red-300: #ec7373;
+  --red-500: #d92d2d;
+  --red-600: #b91f1f;
+  --red-700: #931a1a;
+  --red-900: #561414;
+
+  /* Info — Blue */
+  --blue-50: #e9f2fe;
+  --blue-300: #5e9bf0;
+  --blue-500: #1565d6;
+  --blue-700: #0c3f88;
+
+  --white: #ffffff;
+
+  /* ============================================================
+     TIER 2 — Semantic roles. The UI references these, never raw.
+     Re-point a role here to change where it pulls from the ramp.
+     ============================================================ */
+
+  /* Surfaces */
+  --color-bg: var(--gray-50);
+  --color-surface: var(--white);
+  --color-surface-hover: var(--gray-50);
+  --color-surface-sunken: var(--gray-100);
+
+  /* Borders */
+  --color-border: var(--gray-200);
+  --color-border-soft: var(--gray-100);
+  --color-border-strong: var(--gray-300);
+
+  /* Text */
+  --color-text: var(--gray-800);
+  --color-text-secondary: var(--gray-600);
+  --color-text-muted: var(--gray-500);
+  --color-text-placeholder: var(--gray-400);
+  --color-text-on-brand: var(--white);
+
+  /* Brand */
+  --color-brand: var(--amber-500);
+  --color-brand-hover: var(--amber-600);
+  --color-brand-strong: var(--amber-700);
+  --color-brand-strong-hover: var(--amber-800);
+  --color-brand-wash: var(--amber-50);
+
+  /* Primary button fill — Amber 600 so white labels clear AA (~4.5:1),
+     while brand-strong (700) stays reserved for amber text on white. */
+  --color-primary-fill: var(--amber-600);
+  --color-primary-fill-hover: var(--amber-700);
+
+  /* Status — success */
+  --color-success: var(--green-500);
+  --color-success-text: var(--green-700);
+  --color-success-bg: var(--green-50);
+
+  /* Status — warning */
+  --color-warning: var(--gold-500);
+
+  /* Status — error */
+  --color-error: var(--red-500);
+  --color-error-text: var(--red-700);
+  --color-error-bg: var(--red-50);
+  --color-error-border: var(--red-100);
+
+  /* Info / secondary action */
+  --color-info: var(--blue-500);
+  --color-info-strong: var(--blue-700);
+
+  /* Focus ring — light amber (softer than brand, still visible) */
+  --color-focus: var(--amber-300);
+
+  /* ---- Back-compat aliases (existing rules still resolve) ---- */
+  --bg: var(--color-bg);
+  --card: var(--color-surface);
+  --border: var(--color-border);
+  --border-soft: var(--color-border-soft);
+  --text: var(--color-text);
+  --text-2: var(--color-text-secondary);
+  --muted: var(--color-text-muted);
+  --brand: var(--color-brand);
+  --brand-dark: var(--color-brand-strong);
+  --accent: var(--color-brand);
+  --green: var(--color-success);
+  --blue: var(--color-info);
+  --warn: var(--color-warning);
+  --error: var(--color-error);
 }
 
 * {
@@ -127,7 +247,7 @@ a {
   height: 32px;
   border-radius: 999px;
   background: var(--border);
-  color: #364153;
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 600;
   flex: none;
@@ -150,7 +270,7 @@ a {
 .nav-user-caret {
   width: 16px;
   height: 16px;
-  color: #9aa3af;
+  color: var(--color-text-placeholder);
   transform: rotate(180deg); /* shared chevron points up; design points down */
   flex: none;
 }
@@ -197,7 +317,7 @@ a {
   flex: none;
 }
 .status-pending {
-  color: #c4c9d2;
+  color: var(--color-text-placeholder);
 }
 .status-captured {
   color: var(--green);
@@ -238,14 +358,18 @@ a {
   flex: none;
 }
 .review-btn {
-  background: var(--brand-dark);
-  color: #fff;
-  border: 1px solid var(--brand-dark);
+  background: var(--color-primary-fill);
+  color: var(--color-text-on-brand);
+  border: 1px solid var(--color-primary-fill);
   border-radius: 8px;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
   flex: none;
+}
+.review-btn:not(:disabled):hover {
+  background: var(--color-primary-fill-hover);
+  border-color: var(--color-primary-fill-hover);
 }
 .review-btn:disabled {
   opacity: 0.5;
@@ -312,7 +436,7 @@ a {
   text-align: left;
 }
 .item-row:hover {
-  background: #fafbfc;
+  background: var(--color-surface-hover);
 }
 .item-left {
   display: flex;
@@ -331,7 +455,7 @@ a {
 .badge {
   font-size: 13px;
   color: var(--muted);
-  background: #f1f3f6;
+  background: var(--color-surface-sunken);
   border-radius: 8px;
   padding: 6px 14px;
 }
@@ -343,7 +467,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--color-surface);
   font-size: 11px;
   color: var(--muted);
 }
@@ -357,20 +481,20 @@ a {
   padding: 0 0 16px;
 }
 .crumb {
-  color: #364153;
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 .crumb:hover {
   color: var(--text);
 }
 .crumb.current {
-  color: #99a1af;
+  color: var(--color-text-placeholder);
   font-weight: 400;
 }
 .crumb-sep {
   width: 16px;
   height: 16px;
-  color: #c8cdd5;
+  color: var(--color-text-placeholder);
   flex: none;
 }
 
@@ -412,7 +536,7 @@ a {
 /* dropzone */
 .dropzone {
   background: var(--bg);
-  border: 2px dashed #d1d5dc;
+  border: 2px dashed var(--color-border-strong);
   border-radius: 12px;
   padding: 16px;
 }
@@ -427,7 +551,7 @@ a {
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: var(--color-text-on-brand);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -436,12 +560,21 @@ a {
   width: 16px;
   height: 16px;
 }
+/* Primary: solid amber fill (Amber 600) so the white label clears AA. */
 .btn-take {
-  background: #b5712a;
+  background: var(--color-primary-fill);
 }
+.btn-take:hover {
+  background: var(--color-primary-fill-hover);
+}
+/* Secondary: outline button — amber border + text, no fill. */
 .btn-library {
-  background: #1a75c6;
-  border: 1px solid #155f99;
+  background: transparent;
+  color: var(--color-brand-strong);
+  border: 1px solid var(--color-brand);
+}
+.btn-library:hover {
+  background: var(--color-brand-wash);
 }
 .dropzone-hint {
   color: var(--muted);
@@ -451,12 +584,12 @@ a {
 
 .evidence-box {
   background: var(--card);
-  border: 1px dashed #d1d5dc;
+  border: 1px dashed var(--color-border-strong);
   border-radius: 12px;
   padding: 40px;
   margin-top: 24px;
   text-align: center;
-  color: #364153;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -516,7 +649,7 @@ a {
 /* ---------- Badges (checklist rows) ---------- */
 .badge-error {
   color: var(--error);
-  background: #fdecec;
+  background: var(--color-error-bg);
 }
 
 /* ---------- Evidence list / cards ---------- */
@@ -531,9 +664,6 @@ a {
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-}
-.evidence-card.is-error {
-  border-color: #f3c5c5;
 }
 .evidence-card-head {
   display: flex;
@@ -563,7 +693,7 @@ a {
   gap: 8px;
 }
 .evidence-name {
-  color: #364153;
+  color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 14px;
   overflow: hidden;
@@ -597,16 +727,16 @@ a {
   height: 12px;
 }
 .pill-ok {
-  color: #047857;
-  background: #e2f7f0;
+  color: var(--color-success-text);
+  background: var(--color-success-bg);
 }
 .pill-error {
-  color: #fff;
+  color: var(--color-text-on-brand);
   background: var(--error);
 }
 .pill-error-soft {
   color: var(--error);
-  background: #fbe5e5;
+  background: var(--color-error-bg);
 }
 
 /* ---------- Icon button (delete) ---------- */
@@ -621,7 +751,7 @@ a {
 }
 .icon-btn:hover {
   color: var(--error);
-  background: #fdecec;
+  background: var(--color-error-bg);
 }
 
 /* ---------- Evidence footer / override ---------- */
@@ -638,7 +768,7 @@ a {
   padding: 16px 12px;
 }
 .evidence-foot.resolved {
-  background: #f6fbf8;
+  background: var(--color-success-bg);
   justify-content: space-between;
 }
 .gps-fail-btn {
@@ -647,7 +777,7 @@ a {
   gap: 6px;
   background: var(--error);
   border: 1px solid var(--error);
-  color: #fff;
+  color: var(--color-text-on-brand);
   border-radius: 6px;
   padding: 6px 12px;
   font-size: 12px;
@@ -684,9 +814,8 @@ a {
   color: var(--text);
 }
 .override-input:focus {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--color-focus);
   outline-offset: 1px;
-  border-color: var(--blue);
 }
 .override-actions {
   display: flex;
@@ -704,7 +833,7 @@ a {
 .btn-ghost:focus-visible,
 .icon-btn:focus-visible,
 .btn-link:focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 .btn-sm {
@@ -715,24 +844,33 @@ a {
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* Neutral secondary (e.g. Cancel): outline, no fill, body-colored text. */
 .btn-ghost {
-  border: 1px solid var(--border);
-  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
   color: var(--text);
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
-  padding: 9px 16px;
+  padding: 8px 16px;
 }
 .btn-ghost:hover {
-  background: #f6f7f9;
+  background: var(--color-surface-hover);
 }
+/* Tertiary text button (e.g. Edit): no fill, no border, brand-colored. */
 .btn-link {
   border: none;
   background: none;
-  color: var(--blue);
-  font-weight: 600;
+  color: var(--color-brand-strong);
+  font-weight: 500;
   font-size: 14px;
+}
+.btn-link:hover {
+  color: var(--color-brand-hover);
+  text-decoration: underline;
 }
 
 /* ---------- App shell (sticky footer) ---------- */
@@ -770,16 +908,20 @@ a {
   gap: 4px;
 }
 .projects-import {
-  color: #99a1af;
+  color: var(--color-text-placeholder);
   font-size: 12px;
 }
 .btn-solid {
-  background: var(--brand-dark);
-  color: #fff;
-  border: 1px solid var(--brand-dark);
+  background: var(--color-primary-fill);
+  color: var(--color-text-on-brand);
+  border: 1px solid var(--color-primary-fill);
   border-radius: 8px;
   padding: 8px 16px;
   font-size: 14px;
+}
+.btn-solid:hover {
+  background: var(--color-primary-fill-hover);
+  border-color: var(--color-primary-fill-hover);
 }
 
 /* ---------- Filters ---------- */
@@ -801,7 +943,7 @@ a {
   flex: none;
 }
 .field-label {
-  color: #364153;
+  color: var(--color-text-secondary);
   font-size: 14px;
   margin-bottom: 6px;
 }
@@ -821,12 +963,11 @@ a {
   background: var(--card);
 }
 .input::placeholder {
-  color: #99a1af;
+  color: var(--color-text-placeholder);
 }
 .input:focus {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--color-focus);
   outline-offset: 1px;
-  border-color: var(--blue);
 }
 .input-wrap:has(.input-icon:first-child) .input {
   padding-left: 42px;
@@ -836,7 +977,7 @@ a {
   left: 14px;
   width: 16px;
   height: 16px;
-  color: #99a1af;
+  color: var(--color-text-placeholder);
   pointer-events: none;
 }
 .input-icon-right {
@@ -850,7 +991,7 @@ a {
 }
 .select-caret {
   transform: rotate(180deg);
-  color: #9aa3af;
+  color: var(--color-text-placeholder);
 }
 
 /* ---------- Project cards ---------- */
@@ -867,7 +1008,7 @@ a {
   padding: 20px;
 }
 .project-card:hover {
-  border-color: #d6dae0;
+  border-color: var(--color-border-strong);
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
 }
 .project-card-head {

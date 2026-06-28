@@ -6,8 +6,6 @@ const MIN_NOTE = 10;
 
 interface Props {
   evidence: Evidence;
-  /** GPS tolerance for this project, in miles */
-  gpsToleranceMi: number;
   onDelete?: () => void;
   onSaveOverride?: (note: string) => void;
 }
@@ -18,7 +16,6 @@ interface Props {
  */
 export default function EvidenceCard({
   evidence,
-  gpsToleranceMi,
   onDelete,
   onSaveOverride,
 }: Props) {
@@ -43,7 +40,7 @@ export default function EvidenceCard({
   }
 
   return (
-    <div className={`evidence-card${unresolved ? " is-error" : ""}`}>
+    <div className="evidence-card">
       <div className="evidence-card-head">
         <div
           className="evidence-thumb"
@@ -115,9 +112,6 @@ export default function EvidenceCard({
             <IconGpsOff className="icon-16" />
             GPS Check Failed — Documentation Required
           </button>
-          <span className="evidence-meta">
-            within {gpsToleranceMi} mi required
-          </span>
         </div>
       )}
 
@@ -154,11 +148,6 @@ export default function EvidenceCard({
             >
               Cancel
             </button>
-            <span className="override-hint">
-              {noteValid
-                ? "Looks good."
-                : `Add at least ${MIN_NOTE} characters.`}
-            </span>
           </div>
         </div>
       )}
