@@ -765,6 +765,10 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  /* Shrink the box to its content so the click target isn't the full row
+     width when used as a flex item (e.g. inside .detail-page). */
+  align-self: flex-start;
+  width: fit-content;
   color: var(--color-text-placeholder);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
@@ -970,21 +974,27 @@ a {
 }
 
 /* ---------- Evidence grid / tiles ---------- */
-/* Always 4 equal columns; cards share one fixed height. */
+/* Up to 3 equal columns; cards share one fixed height. */
 .evidence-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  /* minmax(0, 1fr) — not 1fr — so columns stay equal even when a card's
+     content (long filename, wider pill row) has a large intrinsic width.
+     Plain 1fr resolves to minmax(auto, 1fr) and lets such a column grow. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .evidence-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 12px;
+  padding: 16px;
+  /* Allow the card to shrink to its column so the filename ellipsizes
+     instead of widening the track. */
+  min-width: 0;
 }
 
 /* Preview locked to a 1:1 box; image fills and crops overflow. */
@@ -1032,7 +1042,7 @@ a {
 .evidence-meta-block {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
   flex: none;
 }
@@ -1066,7 +1076,7 @@ a {
 
 @media (max-width: 1023px) {
   .evidence-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1084,6 +1094,9 @@ a {
   border-radius: 999px;
   padding: 3px 10px;
   white-space: nowrap;
+  /* Sentence case, regular weight — overrides the shared .pill type rule above */
+  text-transform: none;
+  font-weight: var(--fw-regular);
 }
 
 .pill-icon {
@@ -1163,10 +1176,25 @@ a {
   outline-offset: 1px;
 }
 
+/* Saved/locked state: looks inert, not like an editable field */
+.override-input:read-only {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+  cursor: default;
+  resize: none;
+}
+
+.override-input:read-only:focus {
+  outline: none;
+}
+
 .btn-save {
   align-self: flex-start;
-  padding: 10px 18px;
-  font-weight: var(--fw-semibold);
+}
+
+.btn-browse:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---------- Buttons (shared) ---------- */

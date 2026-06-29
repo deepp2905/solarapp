@@ -19,7 +19,6 @@ export default function EvidenceCard({
   onDelete,
 }: Props) {
   const gpsFailed = evidence.gps === "failed";
-  const resolved = Boolean(evidence.overrideNote);
 
   // Simulate an upload/processing delay for freshly added images.
   const showSkeleton = Boolean(loading);
@@ -60,16 +59,15 @@ export default function EvidenceCard({
         <div className="evidence-pills">
           {gpsFailed ? (
             <>
-              <span className="pill pill-error-soft">GPS Failed</span>
+              <span className="pill pill-error-soft">GPS failed</span>
               {evidence.distanceMi !== undefined && (
                 <span className="pill pill-error-soft">
                   {evidence.distanceMi} mi from site
                 </span>
               )}
-              {resolved && <span className="pill pill-ok">Override saved</span>}
             </>
           ) : (
-            <span className="pill pill-ok">GPS OK</span>
+            <span className="pill pill-ok">GPS Verified</span>
           )}
         </div>
 

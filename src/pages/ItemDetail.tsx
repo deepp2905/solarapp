@@ -86,7 +86,7 @@ export default function ItemDetail() {
         <div className="detail-title-row">
           <h1 className="detail-title">{item.title}</h1>
           {item.status === "error" && (
-            <span className="pill pill-error-soft">GPS Failed</span>
+            <span className="pill pill-error-soft">GPS failed</span>
           )}
         </div>
         <p className="detail-subtitle">{item.subtitle}</p>
