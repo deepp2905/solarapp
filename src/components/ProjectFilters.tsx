@@ -1,4 +1,5 @@
-import { IconChevron, IconSearch } from "./Icon";
+import { IconSearch } from "./Icon";
+import Select from "./Select";
 
 interface Props {
   query: string;
@@ -33,21 +34,15 @@ export default function ProjectFilters({
 
       <label className="field field-ahj">
         <span className="field-label">Jurisdiction (AHJ)</span>
-        <span className="input-wrap">
-          <select
-            className="input select"
-            value={ahj}
-            onChange={(e) => onAhjChange(e.target.value)}
-          >
-            <option value="all">All jurisdictions</option>
-            {jurisdictions.map((j) => (
-              <option key={j} value={j}>
-                {j}
-              </option>
-            ))}
-          </select>
-          <IconChevron className="input-icon input-icon-right select-caret" />
-        </span>
+        <Select
+          value={ahj}
+          onChange={onAhjChange}
+          ariaLabel="Jurisdiction (AHJ)"
+          options={[
+            { value: "all", label: "All jurisdictions" },
+            ...jurisdictions.map((j) => ({ value: j, label: j })),
+          ]}
+        />
       </label>
     </div>
   );
