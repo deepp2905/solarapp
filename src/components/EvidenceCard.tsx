@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Evidence } from "../data";
 import { IconImage, IconTrash } from "./Icon";
+import ConfirmDialog from "./ConfirmDialog";
 
 interface Props {
   evidence: Evidence;
@@ -19,6 +20,7 @@ export default function EvidenceCard({
   onDelete,
 }: Props) {
   const gpsFailed = evidence.gps === "failed";
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Simulate an upload/processing delay for freshly added images.
   const showSkeleton = Boolean(loading);
@@ -30,28 +32,37 @@ export default function EvidenceCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  function handleDelete() {
-    if (window.confirm("Delete this file? This can't be undone.")) {
-      onDelete?.();
-    }
+  function confirmDelete() {
+    setConfirmOpen(false);
+    onDelete?.();
+  }
+
+  if (showSkeleton) {
+    return (
+      <div className="evidence-card">
+        <div className="evidence-preview evidence-preview--loading">
+          <div className="skeleton skeleton-preview" />
+        </div>
+        <div className="evidence-meta-block">
+          <div className="skeleton skeleton-pill" />
+          <div className="skeleton skeleton-line" />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="evidence-card">
+    <div className={`evidence-card${gpsFailed ? " evidence-card--failed" : ""}`}>
       <div
         className="evidence-preview"
         style={
-          evidence.thumbnailUrl && !showSkeleton
+          evidence.thumbnailUrl
             ? { backgroundImage: `url(${evidence.thumbnailUrl})` }
             : undefined
         }
       >
-        {showSkeleton ? (
-          <div className="evidence-skeleton" />
-        ) : (
-          !evidence.thumbnailUrl && (
-            <IconImage className="evidence-preview-icon" />
-          )
+        {!evidence.thumbnailUrl && (
+          <IconImage className="evidence-preview-icon" />
         )}
       </div>
 
@@ -67,23 +78,36 @@ export default function EvidenceCard({
               )}
             </>
           ) : (
-            <span className="pill pill-ok">GPS Verified</span>
+            <span className="pill pill-ok">GPS verified</span>
           )}
         </div>
 
         <div className="evidence-info-top">
-          <span className="evidence-name">{evidence.displayName}</span>
+          <span className="evidence-name" title={evidence.displayName}>
+            {evidence.displayName}
+          </span>
           <button
             type="button"
-            className="icon-btn"
+            className="icon-btn evidence-delete"
             aria-label="Delete file"
             title="Delete file"
-            onClick={handleDelete}
+            onClick={() => setConfirmOpen(true)}
           >
             <IconTrash className="icon-16" />
           </button>
         </div>
       </div>
+
+      {confirmOpen && (
+        <ConfirmDialog
+          title={`Delete ${evidence.displayName}?`}
+          subtitle="This file will be permanently removed from this item. This can't be undone."
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 }

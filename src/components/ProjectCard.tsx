@@ -15,7 +15,7 @@ export default function ProjectCard({ project }: { project: Project }) {
 
       <div className="project-card-body">
         <div className="project-card-titlerow">
-          <h3 className="project-card-name">{project.name}</h3>
+          <h1 className="project-card-name">{project.name}</h1>
           <span className="type-chip">{project.type}</span>
         </div>
         <p className="project-card-address">{project.address}</p>
