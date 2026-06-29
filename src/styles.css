@@ -1539,10 +1539,6 @@ a {
   font-weight: var(--fw-semibold);
 }
 
-.select-option.is-selected.is-active {
-  background: var(--color-brand-wash);
-}
-
 /* ---------- Project grid + cards ---------- */
 .projects-grid {
   display: grid;
@@ -1553,12 +1549,12 @@ a {
 .project-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   min-width: 0;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 26px;
+  padding: 24px;
 }
 
 .project-card:hover {
@@ -1608,7 +1604,8 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-top: 2px;
+  margin-top: auto;
+  padding-top: 8px;
 }
 
 .project-card-pct {
@@ -1653,11 +1650,11 @@ a {
 }
 
 .status-badge--in-progress {
-  color: var(--color-brand-strong);
+  color: var(--color-brand);
 }
 
 .status-badge--complete {
-  color: var(--color-success-text);
+  color: var(--color-success);
 }
 
 .status-badge--not-started {
