@@ -115,6 +115,9 @@
 
   /* Status — warning */
   --color-warning: var(--gold-500);
+  --color-warning-text: var(--gold-700);
+  --color-warning-bg: var(--gold-50);
+  --color-warning-border: var(--gold-100);
 
   /* Status — error */
   --color-error: var(--red-500);
@@ -871,6 +874,14 @@ a {
   gap: 12px;
 }
 
+/* Mobile: double the space above the pager so it reads as a separate footer.
+   In a flex column, this margin adds on top of the 48px column gap (→ ~96px). */
+@media (max-width: 639px) {
+  .item-pager {
+    margin-top: 48px;
+  }
+}
+
 .item-pager-btn {
   display: inline-flex;
   align-items: center;
@@ -1430,11 +1441,16 @@ a {
 .gps-banner {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  /* Tighter gap groups chips + headline as the "problem"; the field below gets
+     extra separation via its own margin (see .gps-banner-field). */
+  gap: 10px;
   padding: 20px;
   border-radius: 14px;
-  border: 1px solid var(--color-error-border);
-  background: var(--color-error-bg);
+  /* GPS-outside-tolerance is a recoverable warning (excused with a reason),
+     not a hard error — amber reads "attention, fixable", and reserves red for
+     true errors. Resolved flips to green. */
+  border: 1px solid var(--color-warning-border);
+  background: var(--color-warning-bg);
   transition: background 0.2s ease, border-color 0.2s ease;
   animation: gps-banner-in 0.22s ease;
 }
@@ -1457,10 +1473,34 @@ a {
   gap: 10px;
 }
 
+/* Title takes the remaining width; the Save/Edit action sits top-right. */
+.gps-banner-head .gps-banner-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.gps-banner-head .btn-save {
+  flex: none;
+  align-self: flex-start;
+}
+
+/* Mobile: keep icon + headline on the first row, drop the action to a full
+   width row beneath instead of squeezing it beside a wrapping title. */
+@media (max-width: 639px) {
+  .gps-banner-head {
+    flex-wrap: wrap;
+  }
+  .gps-banner-head .btn-save {
+    flex-basis: 100%;
+    align-self: stretch;
+    width: 100%;
+  }
+}
+
 .gps-banner-icon {
   flex: none;
   display: flex;
-  color: var(--color-error);
+  color: var(--color-warning);
 }
 
 .gps-banner--resolved .gps-banner-icon {
@@ -1472,7 +1512,7 @@ a {
   font-size: var(--fs-title);
   line-height: var(--lh-title);
   font-weight: var(--fw-semibold);
-  color: var(--color-error-text);
+  color: var(--color-warning-text);
 }
 
 .gps-banner--resolved .gps-banner-title {
@@ -1516,7 +1556,7 @@ a {
   flex: none;
   padding-left: 8px;
   border-left: 1px solid var(--border);
-  color: var(--color-error-text);
+  color: var(--color-warning-text);
   font-weight: var(--fw-semibold);
 }
 
@@ -1534,6 +1574,8 @@ a {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  /* Separate the resolution field from the problem statement above it. */
+  margin-top: 8px;
 }
 
 .gps-banner-label {
@@ -1544,20 +1586,14 @@ a {
   color: var(--color-text-secondary);
 }
 
-/* Save/Edit action sits below the textarea, hugging the right edge. */
-.gps-banner-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
 /* Resolved "Edit" button: tint to success so it belongs to the green banner
    instead of reading as a neutral gray-bordered button. */
-.gps-banner--resolved .gps-banner-actions .btn-browse {
+.gps-banner--resolved .gps-banner-head .btn-browse {
   border-color: var(--green-100);
   color: var(--color-success-text);
 }
 
-.gps-banner--resolved .gps-banner-actions .btn-browse:hover {
+.gps-banner--resolved .gps-banner-head .btn-browse:hover {
   background: var(--color-success-bg);
   border-color: var(--green-300);
 }
@@ -1567,7 +1603,7 @@ a {
   margin-left: 4px;
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--color-error);
+  background: var(--color-warning);
   color: var(--color-text-on-brand);
   font-size: var(--fs-overline);
   line-height: var(--lh-overline);
@@ -1628,12 +1664,14 @@ a {
 
 /* Save button inside the (red) GPS banner — red fill so it belongs to the
    alert instead of clashing amber against the light-red background. */
+/* Primary action inside the (light amber) warning banner: a deep amber fill so
+   it stands out from the wash instead of blending. */
 .gps-banner-save {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-error);
-  background: var(--color-error);
+  border: 1px solid var(--gold-600);
+  background: var(--gold-600);
   color: var(--color-text-on-brand);
   font-weight: var(--fw-semibold);
   transition: background 0.15s ease, border-color 0.15s ease,
@@ -1641,8 +1679,8 @@ a {
 }
 
 .gps-banner-save:not(:disabled):hover {
-  background: var(--red-600);
-  border-color: var(--red-600);
+  background: var(--gold-700);
+  border-color: var(--gold-700);
 }
 
 .gps-banner-save:not(:disabled):active {

@@ -72,6 +72,14 @@ export default function OverrideForm({
             ? "GPS exception resolved"
             : `The following ${failures.length === 1 ? "image is" : "images are"} outside the ${toleranceMi} mi site tolerance`}
         </h2>
+        <button
+          type="button"
+          className={`btn-save ${saved ? "btn-browse" : "gps-banner-save"}`}
+          disabled={!saved && !canSave}
+          onClick={handleClick}
+        >
+          {saved ? "Edit" : "Save reason"}
+        </button>
       </div>
 
       <div className="gps-banner-field">
@@ -91,17 +99,6 @@ export default function OverrideForm({
           tabIndex={saved ? -1 : 0}
           aria-readonly={saved}
         />
-
-        <div className="gps-banner-actions">
-          <button
-            type="button"
-            className={`btn-save ${saved ? "btn-browse" : "gps-banner-save"}`}
-            disabled={!saved && !canSave}
-            onClick={handleClick}
-          >
-            {saved ? "Edit" : "Save reason"}
-          </button>
-        </div>
       </div>
     </section>
   );
