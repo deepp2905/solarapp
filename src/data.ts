@@ -103,11 +103,11 @@ function buildSections(): Section[] {
       ),
       item(
         "Roof Overview",
-        "Wide shot of the roof showing the full array and surrounding layout."
+        "Wide-angle or elevated photo showing the entire roof with all installed arrays — minimum 1 photo per mounting plane. Orient to ensure PV module count, fire setback pathways, and vent/obstacle locations are visible. Show tape measure in the photos as appropriate. Show no damaged or broken tiles or shingles around the work area."
       ),
       item(
         "Equipment Wall Overview",
-        "Wide shot of the equipment wall showing all mounted devices together.",
+        "A wide front shot showing all existing and new electrical equipment in a single frame. Add a side-angle shot showing working clearance in front of all equipment. Show full conduit runs from the roof and between all equipment.",
         { optional: true }
       ),
     ],
@@ -118,11 +118,11 @@ function buildSections(): Section[] {
     items: [
       item(
         "PV Module Nameplate Label",
-        "Close-up of the PV module nameplate showing manufacturer, model, and ratings."
+        "Close-up of the module manufacturer nameplate on the back of at least one representative module. Must show manufacturer, model number, Voc, Isc, Vmp, Imp, STC power rating, and UL/certification mark."
       ),
       item(
         "Module-Level Power Electronics (MLPE) label",
-        "Close-up of the MLPE (optimizer/microinverter) label showing model and serial."
+        "Photo of the MLPE (DC-DC controller, microinverter, MCI) nameplate label"
       ),
       item(
         "Racking System Overview",
@@ -343,15 +343,58 @@ function seedProgress(sections: Section[], fraction: number): Section[] {
   return sections;
 }
 
+// Items (by id) seeded with an *unresolved* GPS failure per project, so a few
+// in-progress projects surface the "GPS Failed!" state on the checklist. Each
+// chosen item sits within that project's captured range so it actually renders.
+const GPS_FAILURE_SEED: Record<string, { itemId: string; distanceMi: number }[]> =
+  {
+    "sample-project": [{ itemId: slug("Site Address"), distanceMi: 32.6 }],
+    "mission-st-retrofit": [
+      { itemId: slug("Roof Overview"), distanceMi: 18.4 },
+      { itemId: slug("Inverter Nameplate"), distanceMi: 27.1 },
+    ],
+    "harborview-solar": [
+      { itemId: slug("Main Panel Nameplate Label"), distanceMi: 9.2 },
+    ],
+  };
+
+// Overwrite an item's evidence with a single unresolved GPS-failed photo and
+// re-derive its status → "error" (GPS Failed!). Runs after seedProgress so the
+// failure is not auto-excused.
+function seedGpsFailure(
+  sections: Section[],
+  itemId: string,
+  distanceMi: number
+): void {
+  for (const section of sections) {
+    const item = section.items.find((i) => i.id === itemId);
+    if (!item) continue;
+    item.evidence = [
+      {
+        fileName: "site-photo.jpg",
+        displayName: "site-photo.jpg",
+        ready: true,
+        gps: "failed",
+        distanceMi,
+      },
+    ];
+    item.filesCaptured = item.evidence.length;
+    item.status = deriveItemStatus(item.evidence);
+    return;
+  }
+}
+
 export const PROJECTS: Project[] = PROJECT_SEEDS.map(
-  ({ withExtra, progress, ...seed }) => ({
-    ...seed,
-    gpsToleranceMi: 0.1,
-    sections: seedProgress(
+  ({ withExtra, progress, id, ...seed }) => {
+    const sections = seedProgress(
       withExtra ? buildSectionsWithExtra() : buildSections(),
       progress
-    ),
-  })
+    );
+    GPS_FAILURE_SEED[id]?.forEach(({ itemId, distanceMi }) =>
+      seedGpsFailure(sections, itemId, distanceMi)
+    );
+    return { ...seed, id, gpsToleranceMi: 0.1, sections };
+  }
 );
 
 export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
