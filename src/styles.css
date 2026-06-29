@@ -1,3 +1,16 @@
+/* Honor the OS "reduce motion" setting: collapse all transitions/animations
+   to near-instant so the micro-interactions never bother sensitive users. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 :root {
   /* ============================================================
      TIER 1 — Raw palette. The ONLY place hex literals live.
@@ -590,6 +603,8 @@ a {
   /* Neutral fill everywhere (cards + checklist header), not brand amber. */
   background: var(--gray-700);
   border-radius: 999px;
+  /* (6) Slide to the new value when progress changes instead of snapping. */
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .progress-count {
@@ -697,8 +712,10 @@ a {
   padding: 14px 24px;
   border-top: 1px solid var(--border-soft);
   text-align: left;
+  transition: background 0.15s ease;
 }
 
+/* (2) Glide the row highlight in; nudge the caret to hint navigation. */
 .item-row:hover {
   background: var(--color-surface-hover);
 }
@@ -761,6 +778,12 @@ a {
   height: 20px;
   color: var(--color-text-muted);
   flex: none;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.item-row:hover .item-caret {
+  transform: translateX(3px);
+  color: var(--color-text-secondary);
 }
 
 /* ---------- Detail page ---------- */
@@ -807,6 +830,10 @@ a {
   font-weight: var(--fw-medium);
 }
 
+.crumb-back {
+  transition: color 0.15s ease;
+}
+
 .crumb-back:hover {
   color: var(--color-text-secondary);
 }
@@ -815,7 +842,15 @@ a {
   width: 20px;
   height: 20px;
   flex: none;
-  transform: rotate(180deg); /* chevron-right → points left for "back" */
+  /* chevron-right → points left for "back" */
+  transform: rotate(180deg) translateX(0);
+  transition: transform 0.15s ease;
+}
+
+/* (10) Slide the back chevron left on hover to reinforce direction.
+   translateX is positive because the icon is rotated 180°. */
+.crumb-back:hover .crumb-back-icon {
+  transform: rotate(180deg) translateX(3px);
 }
 
 /* Detail page: generous vertical rhythm between sections */
@@ -846,6 +881,18 @@ a {
 
 .detail-title {
   margin: 0;
+}
+
+/* (7) Fade + rise the status pill in when an item's state changes. */
+.detail-title-row .pill {
+  animation: pill-in 0.22s ease;
+}
+
+@keyframes pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
 }
 
 .detail-subtitle {
@@ -1001,6 +1048,31 @@ a {
   background: var(--color-brand-hover);
 }
 
+/* (5) Shared button motion: ease color/border changes and add a tactile
+   press-down on click. Applies to every button variant in the app. */
+.btn,
+.btn-browse,
+.btn-take,
+.btn-danger,
+.btn-solid,
+.btn-add,
+.review-btn,
+.btn-save {
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.08s ease;
+}
+
+.btn:active,
+.btn-browse:active,
+.btn-take:active,
+.btn-danger:active,
+.btn-solid:active,
+.btn-add:active,
+.review-btn:not(:disabled):active,
+.btn-save:active {
+  transform: scale(0.97);
+}
+
 /* ---------- Generic icon sizes ---------- */
 .icon-14 {
   width: 14px;
@@ -1029,6 +1101,18 @@ a {
      Plain 1fr resolves to minmax(auto, 1fr) and lets such a column grow. */
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+}
+
+/* motion.div wrapper around each evidence card (mount/exit animation) — must
+   behave as the grid item and let the card fill it. */
+.evidence-grid-item {
+  min-width: 0;
+  display: flex;
+}
+
+.evidence-grid-item > .evidence-card {
+  flex: 1;
+  min-width: 0;
 }
 
 .evidence-card {
@@ -1398,6 +1482,15 @@ a {
   font-weight: var(--fw-semibold);
 }
 
+/* (10) Rotate the "+" a touch on hover for a playful add affordance. */
+.btn-add svg {
+  transition: transform 0.18s ease;
+}
+
+.btn-add:hover svg {
+  transform: rotate(90deg);
+}
+
 .projects-import {
   color: var(--color-text-muted);
   margin: 0;
@@ -1539,6 +1632,16 @@ a {
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 12px 32px rgba(31, 27, 23, 0.16);
+  /* (3) Fade + slide-down entrance, as if expanding from the trigger. */
+  transform-origin: top center;
+  animation: select-menu-in 0.14s ease;
+}
+
+@keyframes select-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
 }
 
 .select-option {
@@ -1550,6 +1653,8 @@ a {
   color: var(--color-text);
   font-size: var(--fs-body-sm);
   line-height: var(--lh-body-sm);
+  /* (4) Ease the hover/selection background for confirmation feedback. */
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
 .select-option.is-active {
@@ -1577,11 +1682,6 @@ a {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
-}
-
-.project-card:hover {
-  border-color: var(--color-border-strong);
-  box-shadow: 0 1px 3px rgba(31, 27, 23, 0.06);
 }
 
 .project-card-top {

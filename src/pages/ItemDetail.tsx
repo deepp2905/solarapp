@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { AnimatePresence, motion } from "motion/react";
 import { deriveItemStatus, findItem, type Evidence } from "../data";
 import { useProject, useProjects } from "../store";
 import EvidenceCard from "../components/EvidenceCard";
@@ -194,17 +195,29 @@ export default function ItemDetail() {
 
       {evidence.length > 0 && (
         <div className="evidence-grid">
-          {evidence.map((ev) => (
-            <EvidenceCard
-              key={ev.uid}
-              evidence={ev}
-              loading={loadingUids.has(ev.uid)}
-              onLoaded={() => clearLoading(ev.uid)}
-              onDelete={() =>
-                setEvidence((list) => list.filter((e) => e.uid !== ev.uid))
-              }
-            />
-          ))}
+          {/* (8) mount fade-in + (9) exit fade/collapse on delete. */}
+          <AnimatePresence initial={false}>
+            {evidence.map((ev) => (
+              <motion.div
+                key={ev.uid}
+                className="evidence-grid-item"
+                layout
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.94 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+              >
+                <EvidenceCard
+                  evidence={ev}
+                  loading={loadingUids.has(ev.uid)}
+                  onLoaded={() => clearLoading(ev.uid)}
+                  onDelete={() =>
+                    setEvidence((list) => list.filter((e) => e.uid !== ev.uid))
+                  }
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
