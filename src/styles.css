@@ -672,10 +672,13 @@ a {
   color: var(--color-text-muted);
   flex: none;
   transition: transform 0.2s ease;
+  /* (4) Default (collapsed): chevron points right. IconChevron points up,
+     so rotate 90° to face right. */
+  transform: rotate(90deg);
 }
 
-/* expanded → chevron points up; collapsed → points down */
-.section.collapsed .section-chevron {
+/* Expanded → rotate down. */
+.section:not(.collapsed) .section-chevron {
   transform: rotate(180deg);
 }
 
@@ -1482,14 +1485,6 @@ a {
   font-weight: var(--fw-semibold);
 }
 
-/* (10) Rotate the "+" a touch on hover for a playful add affordance. */
-.btn-add svg {
-  transition: transform 0.18s ease;
-}
-
-.btn-add:hover svg {
-  transform: rotate(90deg);
-}
 
 .projects-import {
   color: var(--color-text-muted);
@@ -1632,29 +1627,19 @@ a {
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 12px 32px rgba(31, 27, 23, 0.16);
-  /* (3) Fade + slide-down entrance, as if expanding from the trigger. */
-  transform-origin: top center;
-  animation: select-menu-in 0.14s ease;
-}
-
-@keyframes select-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.985);
-  }
 }
 
 .select-option {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
   color: var(--color-text);
   font-size: var(--fs-body-sm);
   line-height: var(--lh-body-sm);
-  /* (4) Ease the hover/selection background for confirmation feedback. */
-  transition: background 0.12s ease, color 0.12s ease;
 }
 
 .select-option.is-active {
@@ -1664,6 +1649,14 @@ a {
 .select-option.is-selected {
   color: var(--color-brand-strong);
   font-weight: var(--fw-semibold);
+}
+
+/* Simple tick beside the selected option (replaces the old menu flash). */
+.select-tick {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--color-brand-strong);
 }
 
 /* ---------- Project grid + cards ---------- */
@@ -1682,6 +1675,12 @@ a {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
+  transition: border-color 0.15s ease;
+}
+
+/* Slightly darker border on hover (gray-200 → gray-300). */
+.project-card:hover {
+  border-color: var(--color-border-strong);
 }
 
 .project-card-top {

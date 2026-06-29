@@ -85,6 +85,20 @@ export const IconError = ({ className }: Props) => (
   </svg>
 );
 
+// Bare checkmark (no circle) — used as the selected tick in the custom select.
+export const IconTick = ({ className }: Props) => (
+  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M5 12.5l4.5 4.5L19 7"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const IconChevron = ({ className }: Props) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
     <path

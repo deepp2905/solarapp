@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { IconChevron } from "./Icon";
+import { IconChevron, IconTick } from "./Icon";
 
 export interface SelectOption {
   value: string;
@@ -159,7 +159,8 @@ export default function Select({
               onMouseEnter={() => setActive(index)}
               onClick={() => commit(index)}
             >
-              {option.label}
+              <span>{option.label}</span>
+              {option.value === value && <IconTick className="select-tick" />}
             </li>
           ))}
         </ul>
