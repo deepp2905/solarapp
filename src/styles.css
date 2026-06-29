@@ -915,6 +915,14 @@ a {
   border-radius: 12px;
   padding: 40px;
   text-align: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+/* Drag-over feedback: shift the whole zone to brand hues so the user gets a
+   clear "drop here" signal. */
+.dropzone--dragging {
+  background: var(--color-brand-wash);
+  border-color: var(--color-brand);
 }
 
 .dropzone-icon {
@@ -928,6 +936,18 @@ a {
   border: 1px solid var(--border);
   color: var(--color-text-muted);
   flex: none;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.dropzone--dragging .dropzone-icon {
+  background: var(--card);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.dropzone--dragging .dropzone-title {
+  color: var(--color-brand-strong);
 }
 
 .icon-26 {

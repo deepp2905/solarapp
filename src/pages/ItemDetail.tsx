@@ -52,6 +52,11 @@ export default function ItemDetail() {
   const browseInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  // Drag-over highlight. A depth counter handles dragenter/dragleave firing on
+  // child elements, so the highlight only clears when the cursor truly leaves.
+  const [dragging, setDragging] = useState(false);
+  const dragDepth = useRef(0);
+
   function addFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
     const added: LocalEvidence[] = Array.from(fileList).map((file) => ({
@@ -121,10 +126,25 @@ export default function ItemDetail() {
       </header>
 
       <div
-        className="dropzone"
+        className={`dropzone${dragging ? " dropzone--dragging" : ""}`}
         onDragOver={(e) => e.preventDefault()}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          dragDepth.current += 1;
+          setDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          dragDepth.current -= 1;
+          if (dragDepth.current <= 0) {
+            dragDepth.current = 0;
+            setDragging(false);
+          }
+        }}
         onDrop={(e) => {
           e.preventDefault();
+          dragDepth.current = 0;
+          setDragging(false);
           addFiles(e.dataTransfer.files);
         }}
       >
@@ -201,7 +221,6 @@ export default function ItemDetail() {
               <motion.div
                 key={ev.uid}
                 className="evidence-grid-item"
-                layout
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.94 }}
