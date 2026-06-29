@@ -520,6 +520,23 @@ export function findItem(project: Project, itemId: string) {
   return null;
 }
 
+/**
+ * Previous / next item in the flattened checklist order (across sections), for
+ * the item-detail pager. Either side is null at the ends of the list.
+ */
+export function siblingItems(
+  project: Project,
+  itemId: string
+): { prev: ChecklistItem | null; next: ChecklistItem | null } {
+  const items = flatItems(project);
+  const i = items.findIndex((it) => it.id === itemId);
+  if (i === -1) return { prev: null, next: null };
+  return {
+    prev: i > 0 ? items[i - 1] : null,
+    next: i < items.length - 1 ? items[i + 1] : null,
+  };
+}
+
 export function statusIconId(status: ItemStatus): string {
   switch (status) {
     case "captured":

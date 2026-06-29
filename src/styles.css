@@ -863,6 +863,76 @@ a {
   gap: 48px;
 }
 
+/* ---------- Item prev/next pager ---------- */
+.item-pager {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.item-pager-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 48%;
+  border-radius: 10px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.08s ease;
+}
+
+.item-pager-btn:active {
+  transform: scale(0.98);
+}
+
+/* Back = secondary (white, bordered). */
+.item-pager-prev {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.item-pager-prev:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+
+/* Next = primary (brand fill). */
+.item-pager-next {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+
+.item-pager-next:hover {
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+.item-pager-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.item-pager-icon-back {
+  transform: rotate(180deg);
+}
+
+/* Single line: title ellipsis-truncates so the button never wraps. */
+.item-pager-title {
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body-sm);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 /* Tie the evidence grid to the dropzone using the grid's own gap (16px),
    countering the 48px page gap so upload area + thumbnails read as one block. */
 .dropzone + .evidence-grid {

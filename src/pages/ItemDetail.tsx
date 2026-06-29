@@ -1,10 +1,16 @@
 import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
-import { deriveItemStatus, findItem, type Evidence } from "../data";
+import {
+  deriveItemStatus,
+  findItem,
+  siblingItems,
+  type Evidence,
+} from "../data";
 import { useProject, useProjects } from "../store";
 import EvidenceCard from "../components/EvidenceCard";
 import OverrideForm from "../components/OverrideForm";
+import ItemPager from "../components/ItemPager";
 import {
   IconCamera,
   IconChevronRight,
@@ -107,6 +113,7 @@ export default function ItemDetail() {
   // only shows while the failure is unresolved.
   const hasGpsFailure = evidence.some((e) => e.gps === "failed");
   const showGpsFailedPill = liveStatus === "error";
+  const { prev, next } = siblingItems(project, item.id);
 
   return (
     <main className="page detail-page">
@@ -262,6 +269,8 @@ export default function ItemDetail() {
           }
         />
       )}
+
+      <ItemPager projectId={project.id} prev={prev} next={next} />
     </main>
   );
 }

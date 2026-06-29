@@ -1,24 +1,33 @@
 import { useEffect, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion, type Variants } from "motion/react";
+import { flatItems } from "./data";
+import { useProjects } from "./store";
 import Projects from "./pages/Projects";
 import Checklist from "./pages/Checklist";
 import ItemDetail from "./pages/ItemDetail";
-
-// Route depth → drives slide direction. Deeper = forward (slide in from right);
-// shallower = back (slide in from left, the mirror of forward).
-function routeDepth(pathname: string): number {
-  if (pathname.includes("/item/")) return 2;
-  if (pathname.startsWith("/project/")) return 1;
-  return 0;
-}
+import type { Project } from "./data";
 
 const DISTANCE = 24; // px of horizontal travel — small, so motion stays fast.
 
-// Variants resolve `enter`/`exit` against the current `custom` (direction) at
-// the moment each runs. Passing direction through AnimatePresence's `custom`
-// means the back navigation is the exact mirror of forward: the outgoing page
-// leaves the same way the incoming one would arrive on a forward move.
+// A monotonic "navigation rank" for a location: it grows as you move forward
+// through the app. Levels are spaced far apart (×1000) so the within-checklist
+// item index never overlaps the level boundary. Comparing two ranks then yields
+// the slide direction uniformly — projects → checklist → item AND item → item.
+function navRank(pathname: string, projects: Project[]): number {
+  const itemMatch = pathname.match(/^\/project\/([^/]+)\/item\/([^/]+)/);
+  if (itemMatch) {
+    const [, projectId, itemId] = itemMatch;
+    const project = projects.find((p) => p.id === projectId);
+    const index = project
+      ? flatItems(project).findIndex((i) => i.id === itemId)
+      : -1;
+    return 2000 + Math.max(index, 0);
+  }
+  if (pathname.startsWith("/project/")) return 1000;
+  return 0;
+}
+
 const pageVariants: Variants = {
   initial: (dir: number) => ({ opacity: 0, x: dir * DISTANCE }),
   enter: { opacity: 1, x: 0 },
@@ -27,18 +36,18 @@ const pageVariants: Variants = {
 
 export default function AnimatedRoutes() {
   const location = useLocation();
-  const depth = routeDepth(location.pathname);
+  const { projects } = useProjects();
+  const rank = navRank(location.pathname, projects);
 
-  // Compare against the previous depth to know which way we're moving.
-  // NOTE: do NOT mutate the ref during render — under StrictMode the render
-  // runs twice, which would clobber the comparison and force direction to 1
-  // every time. Commit the new depth in an effect, after render.
-  const prevDepth = useRef(depth);
-  const direction = depth >= prevDepth.current ? 1 : -1; // 1 forward, -1 back
+  // Compare against the previous rank to know which way we're moving.
+  // NOTE: don't mutate the ref during render — under StrictMode the render runs
+  // twice, which would clobber the comparison. Commit it in an effect instead.
+  const prevRank = useRef(rank);
+  const direction = rank >= prevRank.current ? 1 : -1; // 1 forward, -1 back
 
   useEffect(() => {
-    prevDepth.current = depth;
-  }, [depth]);
+    prevRank.current = rank;
+  }, [rank]);
 
   return (
     <AnimatePresence mode="wait" initial={false} custom={direction}>
