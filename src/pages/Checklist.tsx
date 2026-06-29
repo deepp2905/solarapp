@@ -5,6 +5,7 @@ import {
   itemStatusLabel,
   sectionCaptured,
   sectionNeedsAttention,
+  sectionTotal,
   totalItems,
 } from "../data";
 import { useProject } from "../store";
@@ -70,7 +71,7 @@ export default function Checklist() {
                   )}
                 </span>
                 <span className="section-count">
-                  {done} of {section.items.length}
+                  {done} of {sectionTotal(section)}
                 </span>
               </button>
 
@@ -83,7 +84,12 @@ export default function Checklist() {
                   >
                     <StatusIcon status={item.status} />
                     <span className="item-text">
-                      <span className="item-title">{item.title}</span>
+                      <span className="item-title-row">
+                        <span className="item-title">{item.title}</span>
+                        {item.optional && (
+                          <span className="item-optional-tag">Optional</span>
+                        )}
+                      </span>
                       <span className={`item-sub item-sub--${item.status}`}>
                         {itemStatusLabel(item)}
                       </span>

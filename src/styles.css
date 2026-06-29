@@ -587,7 +587,8 @@ a {
 .progress-fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: var(--brand);
+  /* Neutral fill everywhere (cards + checklist header), not brand amber. */
+  background: var(--gray-700);
   border-radius: 999px;
 }
 
@@ -710,9 +711,30 @@ a {
   min-width: 0;
 }
 
+.item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .item-title {
   color: var(--text);
   font-weight: var(--fw-medium);
+}
+
+/* "Optional" tag on non-required checklist items. */
+.item-optional-tag {
+  flex: none;
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: var(--fs-overline);
+  line-height: var(--lh-overline);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tr-overline);
+  text-transform: uppercase;
 }
 
 .item-sub {
@@ -1615,11 +1637,6 @@ a {
 
 .project-card .progress-track {
   height: 4px;
-}
-
-/* Card progress uses a neutral fill (gray-700) rather than brand amber. */
-.project-card .progress-fill {
-  background: var(--gray-700);
 }
 
 /* Type chip (PV / ST) */

@@ -22,6 +22,12 @@ export interface ChecklistItem {
   status: ItemStatus;
   filesCaptured?: number;
   evidence?: Evidence[];
+  /**
+   * Optional items are not required for completion: they're excluded from the
+   * section/project totals and a project can be Complete with them still empty.
+   * Optional items are always ordered last within their section.
+   */
+  optional?: boolean;
 }
 
 export interface Section {
@@ -101,7 +107,8 @@ function buildSections(): Section[] {
       ),
       item(
         "Equipment Wall Overview",
-        "Wide shot of the equipment wall showing all mounted devices together."
+        "Wide shot of the equipment wall showing all mounted devices together.",
+        { optional: true }
       ),
     ],
   },
@@ -144,7 +151,8 @@ function buildSections(): Section[] {
       ),
       item(
         "Conduit Penetration",
-        "Close-up of the roof conduit penetration and its weather sealing."
+        "Close-up of the roof conduit penetration and its weather sealing.",
+        { optional: true }
       ),
     ],
   },
@@ -211,8 +219,6 @@ function buildSections(): Section[] {
         "Backfeed Breaker Rating (Subpanel)",
         "Close-up of the solar backfeed breaker rating in the subpanel."
       ),
-      item("Water Bond", "Close-up of the water pipe bonding connection."),
-      item("Gas Bond", "Close-up of the gas pipe bonding connection."),
       item(
         "Grounding Electrode System Connection",
         "Close-up of the grounding electrode system connection."
@@ -225,6 +231,13 @@ function buildSections(): Section[] {
         "AC Disconnect",
         "Photo of the AC disconnect in its final mounted location."
       ),
+      // Optional items, kept at the end of the section.
+      item("Water Bond", "Close-up of the water pipe bonding connection.", {
+        optional: true,
+      }),
+      item("Gas Bond", "Close-up of the gas pipe bonding connection.", {
+        optional: true,
+      }),
     ],
   },
   {
@@ -375,12 +388,18 @@ export function flatItems(project: Project): ChecklistItem[] {
   return project.sections.flatMap((s) => s.items);
 }
 
+// Optional items are excluded from completion math: they don't add to the
+// required total, and a project can be Complete with them still empty.
+const isRequired = (i: ChecklistItem) => !i.optional;
+
 export function totalItems(project: Project): number {
-  return flatItems(project).length;
+  return flatItems(project).filter(isRequired).length;
 }
 
 export function capturedItems(project: Project): number {
-  return flatItems(project).filter((i) => i.status === "captured").length;
+  return flatItems(project).filter(
+    (i) => isRequired(i) && i.status === "captured"
+  ).length;
 }
 
 /**
@@ -397,9 +416,16 @@ export function deriveProjectStatus(project: Project): ProjectStatus {
   return "in-progress";
 }
 
-/** Captured count within a single section. */
+/** Captured count within a single section (required items only). */
 export function sectionCaptured(section: Section): number {
-  return section.items.filter((i) => i.status === "captured").length;
+  return section.items.filter(
+    (i) => isRequired(i) && i.status === "captured"
+  ).length;
+}
+
+/** Required-item count within a single section (denominator for "N of M"). */
+export function sectionTotal(section: Section): number {
+  return section.items.filter(isRequired).length;
 }
 
 /** A section needs attention if any of its items is in an error state. */
@@ -419,7 +445,8 @@ export function itemStatusLabel(item: ChecklistItem): string {
     case "warning":
       return "Needs review";
     default:
-      return "Pending";
+      // An empty optional item reads "Optional", not "Pending".
+      return item.optional ? "Optional" : "Pending";
   }
 }
 
