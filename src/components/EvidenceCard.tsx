@@ -9,6 +9,7 @@ interface Props {
 /** A captured-evidence tile: image preview on top, status pills + filename below. */
 export default function EvidenceCard({ evidence, onDelete }: Props) {
   const gpsFailed = evidence.gps === "failed";
+  const resolved = Boolean(evidence.overrideNote);
 
   function handleDelete() {
     if (window.confirm("Delete this file? This can't be undone.")) {
@@ -41,6 +42,7 @@ export default function EvidenceCard({ evidence, onDelete }: Props) {
                   {evidence.distanceMi} mi from site
                 </span>
               )}
+              {resolved && <span className="pill pill-ok">Override saved</span>}
             </>
           ) : (
             <span className="pill pill-ok">GPS OK</span>

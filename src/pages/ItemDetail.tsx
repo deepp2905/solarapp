@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { findItem, findProject, type Evidence } from "../data";
 import EvidenceCard from "../components/EvidenceCard";
@@ -22,6 +22,25 @@ export default function ItemDetail() {
   const [evidence, setEvidence] = useState<Evidence[]>(
     found?.item.evidence ?? []
   );
+
+  // Hidden inputs: one for library/browse, one that prefers the camera.
+  const browseInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  function addFiles(fileList: FileList | null) {
+    if (!fileList || fileList.length === 0) return;
+    const added: Evidence[] = Array.from(fileList).map((file) => ({
+      fileName: file.name,
+      displayName: file.name,
+      ready: true,
+      // Manually added files don't run the on-site GPS check in this prototype.
+      gps: "ok",
+      thumbnailUrl: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : undefined,
+    }));
+    setEvidence((list) => [...list, ...added]);
+  }
 
   if (!project || !found) {
     return (
@@ -54,7 +73,38 @@ export default function ItemDetail() {
         <p className="detail-subtitle">{item.subtitle}</p>
       </header>
 
-      <div className="dropzone">
+      <div
+        className="dropzone"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          addFiles(e.dataTransfer.files);
+        }}
+      >
+        {/* Hidden file inputs driven by the buttons below */}
+        <input
+          ref={browseInputRef}
+          type="file"
+          accept="image/*,application/pdf"
+          multiple
+          hidden
+          onChange={(e) => {
+            addFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={(e) => {
+            addFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+
         {/* Desktop: drag-and-drop + browse */}
         <span className="dropzone-icon dropzone-desktop">
           <IconUpload className="icon-26" />
@@ -63,7 +113,11 @@ export default function ItemDetail() {
           <p className="dropzone-title">Drag photos &amp; PDFs here</p>
           <p className="dropzone-sub">Drop several at once or browse to upload.</p>
         </div>
-        <button type="button" className="btn-browse dropzone-desktop">
+        <button
+          type="button"
+          className="btn-browse dropzone-desktop"
+          onClick={() => browseInputRef.current?.click()}
+        >
           Browse files
         </button>
 
@@ -72,10 +126,18 @@ export default function ItemDetail() {
           <p className="dropzone-title">Add a photo</p>
           <p className="dropzone-sub">Take a picture or upload from your gallery.</p>
           <div className="dropzone-cta-row">
-            <button type="button" className="btn btn-take">
+            <button
+              type="button"
+              className="btn btn-take"
+              onClick={() => cameraInputRef.current?.click()}
+            >
               <IconCamera className="icon-16" /> Take a picture
             </button>
-            <button type="button" className="btn-browse">
+            <button
+              type="button"
+              className="btn-browse"
+              onClick={() => browseInputRef.current?.click()}
+            >
               <IconImage className="icon-16" /> Upload from gallery
             </button>
           </div>

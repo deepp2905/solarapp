@@ -279,6 +279,20 @@ const PROJECT_SEEDS: ProjectSeed[] = [
   { id: "bayfront-install", name: "Bayfront Install", address: "12 Bay St, Milpitas, CA", type: "PV", ahj: "City of Milpitas", status: "not-started", progress: 0 },
 ];
 
+const RESOLVED_OVERRIDE_NOTE =
+  "Interior install — no GPS signal at the equipment location; address confirmed on site.";
+
+// A captured item must not carry an *unresolved* GPS failure. Any failed
+// evidence on a captured item gets a documented override reason, so a 100%
+// project never contains a dangling GPS failure.
+function resolveCapturedEvidence(item: ChecklistItem): void {
+  item.evidence?.forEach((ev) => {
+    if (ev.gps === "failed" && !ev.overrideNote) {
+      ev.overrideNote = RESOLVED_OVERRIDE_NOTE;
+    }
+  });
+}
+
 // Mark the first `fraction` of a section list's items as captured.
 function seedProgress(sections: Section[], fraction: number): Section[] {
   const items = sections.flatMap((s) => s.items);
@@ -287,6 +301,7 @@ function seedProgress(sections: Section[], fraction: number): Section[] {
     if (i < target) {
       item.status = "captured";
       item.filesCaptured = item.filesCaptured ?? 1;
+      resolveCapturedEvidence(item);
     } else {
       // ensure anything pre-seeded as captured beyond target is reset
       if (item.status === "captured") {

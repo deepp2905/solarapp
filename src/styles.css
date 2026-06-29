@@ -352,9 +352,19 @@ a {
 }
 
 .page {
-  max-width: 1280px;
+  width: 60%;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 32px 32px 80px;
+  padding: 96px 0 80px;
+}
+
+/* Narrow viewports: let the container breathe edge-to-edge with padding */
+@media (max-width: 1200px) {
+  .page {
+    width: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 /* ---------- Top nav (global) ---------- */
@@ -777,8 +787,6 @@ a {
   display: flex;
   flex-direction: column;
   gap: 48px;
-  padding-top: 64px;
-  padding-bottom: 64px;
 }
 
 .detail-heading {
@@ -953,6 +961,7 @@ a {
 }
 
 /* ---------- Evidence grid / tiles ---------- */
+/* Always 4 equal columns; cards share one fixed height. */
 .evidence-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -963,6 +972,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height: 240px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -970,7 +980,8 @@ a {
 }
 
 .evidence-preview {
-  height: 160px;
+  flex: 1; /* fills remaining height so all previews match */
+  min-height: 0;
   border-radius: 8px;
   background: var(--color-bg) center / cover no-repeat;
   display: flex;
@@ -990,6 +1001,12 @@ a {
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+  flex: none;
+}
+
+/* Reserve one row for pills so single- vs multi-pill cards align */
+.evidence-meta-block .evidence-pills {
+  min-height: 22px;
 }
 
 .evidence-pills {
@@ -1149,8 +1166,6 @@ a {
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  /* 32px page padding + 16px = 48px total gap below the sticky nav */
-  margin-top: 16px;
   margin-bottom: 28px;
 }
 
