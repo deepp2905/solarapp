@@ -1054,7 +1054,6 @@ a {
 .skeleton-preview {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
 }
 
 /* Drop the centering/padding so the preview skeleton fills edge-to-edge */
@@ -1063,18 +1062,16 @@ a {
   background: none;
 }
 
-/* Small pill-shaped block standing in for the status chip */
+/* Small block standing in for the status chip */
 .skeleton-pill {
   width: 84px;
   height: 22px;
-  border-radius: 999px;
 }
 
 /* Longer block standing in for the filename text */
 .skeleton-line {
   width: 100%;
   height: 16px;
-  border-radius: 6px;
 }
 
 .evidence-preview-icon {
