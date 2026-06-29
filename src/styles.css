@@ -1106,6 +1106,15 @@ a {
   .dropzone {
     padding: 28px 20px;
   }
+  /* Stack the two CTAs as full-width buttons on separate rows. */
+  .dropzone-cta-row {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .dropzone-cta {
+    width: 100%;
+    flex: none;
+  }
 }
 
 /* ---------- Shared buttons ---------- */
@@ -1348,6 +1357,12 @@ a {
   .evidence-grid {
     grid-template-columns: 1fr;
   }
+  /* Single-column cards would make a 1:1 preview span the full width and get
+     very tall; pin a fixed 240px height instead. */
+  .evidence-preview {
+    aspect-ratio: auto;
+    height: 240px;
+  }
 }
 
 /* ---------- Pills ---------- */
@@ -1505,7 +1520,13 @@ a {
   font-weight: var(--fw-semibold);
 }
 
+.gps-banner--resolved .gps-banner-file {
+  border-color: var(--green-100);
+}
+
 .gps-banner--resolved .gps-banner-file-dist {
+  padding-left: 8px;
+  border-left-color: var(--green-100);
   color: var(--color-text-muted);
 }
 
@@ -1527,6 +1548,18 @@ a {
 .gps-banner-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+/* Resolved "Edit" button: tint to success so it belongs to the green banner
+   instead of reading as a neutral gray-bordered button. */
+.gps-banner--resolved .gps-banner-actions .btn-browse {
+  border-color: var(--green-100);
+  color: var(--color-success-text);
+}
+
+.gps-banner--resolved .gps-banner-actions .btn-browse:hover {
+  background: var(--color-success-bg);
+  border-color: var(--green-300);
 }
 
 .gps-banner-required {
@@ -1571,6 +1604,15 @@ a {
   color: var(--color-text-secondary);
   cursor: default;
   resize: none;
+}
+
+/* Inside the resolved (green) banner the saved note shouldn't read as a gray
+   inert field floating in green. Give it the surface white + a green-tinted
+   border so it harmonizes with the banner. */
+.gps-banner--resolved .override-input:read-only {
+  background: var(--card);
+  border-color: var(--green-100);
+  color: var(--color-text-secondary);
 }
 
 .override-input:read-only:focus {

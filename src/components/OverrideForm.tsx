@@ -46,6 +46,19 @@ export default function OverrideForm({
 
   return (
     <section className={`gps-banner${saved ? " gps-banner--resolved" : ""}`}>
+      {failures.length > 0 && (
+        <ul className="gps-banner-files">
+          {failures.map((f) => (
+            <li key={f.displayName} className="gps-banner-file">
+              <span className="gps-banner-file-name">{f.displayName}</span>
+              {f.distanceMi !== undefined && (
+                <span className="gps-banner-file-dist">{f.distanceMi} mi</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
       <div className="gps-banner-head">
         <span className="gps-banner-icon">
           {saved ? (
@@ -60,19 +73,6 @@ export default function OverrideForm({
             : `The following ${failures.length === 1 ? "image is" : "images are"} outside the ${toleranceMi} mi site tolerance`}
         </h2>
       </div>
-
-      {failures.length > 0 && (
-        <ul className="gps-banner-files">
-          {failures.map((f) => (
-            <li key={f.displayName} className="gps-banner-file">
-              <span className="gps-banner-file-name">{f.displayName}</span>
-              {f.distanceMi !== undefined && (
-                <span className="gps-banner-file-dist">{f.distanceMi} mi</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
 
       <div className="gps-banner-field">
         <label className="gps-banner-label" htmlFor="gps-reason">
