@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import {
-  capturedItems,
-  findItem,
-  findProject,
-  flatItems,
-  type Evidence,
-} from "../data";
+import { findItem, findProject, type Evidence } from "../data";
 import EvidenceCard from "../components/EvidenceCard";
+import OverrideForm from "../components/OverrideForm";
 import {
-  IconArrowRight,
+  IconCamera,
   IconChevronRight,
   IconImage,
+  IconUpload,
 } from "../components/Icon";
 
 export default function ItemDetail() {
@@ -38,66 +34,58 @@ export default function ItemDetail() {
   }
 
   const { item } = found;
-  const items = flatItems(project);
-  const total = items.length;
-  const completed = capturedItems(project);
-  const index = items.findIndex((i) => i.id === item.id);
-  const prev = items[index - 1];
-  const next = items[index + 1];
   const checklistPath = `/project/${project.id}`;
+  const hasGpsFailure = evidence.some((e) => e.gps === "failed");
 
   return (
-    <main className="page">
-      <nav className="breadcrumb">
-        <Link to={checklistPath} className="crumb">
-          {project.name}
-        </Link>
-        <IconChevronRight className="crumb-sep" />
-        <Link to={checklistPath} className="crumb">
-          Checklist
-        </Link>
-        <IconChevronRight className="crumb-sep" />
-        <span className="crumb current">{item.title}</span>
-      </nav>
+    <main className="page detail-page">
+      <Link to={checklistPath} className="crumb-back">
+        <IconChevronRight className="crumb-back-icon" />
+        Back to Checklist
+      </Link>
 
-      <div className="detail-progress">
-        <div className="progress-wrap detail-progress-bar">
-          <div className="progress-track">
-            <div
-              className="progress-fill"
-              style={{ width: `${(completed / total) * 100}%` }}
-            />
-          </div>
-          <span className="progress-count">
-            {completed}/{total}
-          </span>
+      <header className="detail-heading">
+        <div className="detail-title-row">
+          <h1 className="detail-title">{item.title}</h1>
+          {item.status === "error" && (
+            <span className="pill pill-error-soft">GPS Failed</span>
+          )}
         </div>
-        <span className="detail-progress-label">
-          {completed} of {total} items
-        </span>
-      </div>
-
-      <div className="detail-heading">
-        <h1 className="detail-title">{item.title}</h1>
         <p className="detail-subtitle">{item.subtitle}</p>
-      </div>
+      </header>
 
       <div className="dropzone">
-        <div className="dropzone-actions">
-          <button className="btn btn-take">
-            <IconImage className="icon-16" /> Take Photo
-          </button>
-          <button className="btn btn-library">
-            <IconImage className="icon-16" /> Choose from Library
-          </button>
+        {/* Desktop: drag-and-drop + browse */}
+        <span className="dropzone-icon dropzone-desktop">
+          <IconUpload className="icon-26" />
+        </span>
+        <div className="dropzone-text dropzone-desktop">
+          <p className="dropzone-title">Drag photos &amp; PDFs here</p>
+          <p className="dropzone-sub">Drop several at once or browse to upload.</p>
         </div>
-        <p className="dropzone-hint">
-          …or drag photos, videos here — you can drop several at once.
-        </p>
+        <button type="button" className="btn-browse dropzone-desktop">
+          Browse files
+        </button>
+
+        {/* Mobile: capture or pick from gallery */}
+        <div className="dropzone-mobile">
+          <p className="dropzone-title">Add a photo</p>
+          <p className="dropzone-sub">Take a picture or upload from your gallery.</p>
+          <div className="dropzone-cta-row">
+            <button type="button" className="btn btn-take">
+              <IconCamera className="icon-16" /> Take a picture
+            </button>
+            <button type="button" className="btn-browse">
+              <IconImage className="icon-16" /> Upload from gallery
+            </button>
+          </div>
+        </div>
+
+        <p className="dropzone-hint">PDF, JPG, PNG · up to 25MB</p>
       </div>
 
-      {evidence.length > 0 ? (
-        <div className="evidence-list">
+      {evidence.length > 0 && (
+        <div className="evidence-grid">
           {evidence.map((ev, i) => (
             <EvidenceCard
               key={ev.fileName + i}
@@ -105,38 +93,22 @@ export default function ItemDetail() {
               onDelete={() =>
                 setEvidence((list) => list.filter((_, j) => j !== i))
               }
-              onSaveOverride={(note) =>
-                setEvidence((list) =>
-                  list.map((e, j) =>
-                    j === i ? { ...e, overrideNote: note } : e
-                  )
-                )
-              }
             />
           ))}
         </div>
-      ) : (
-        <div className="evidence-box">No evidence captured yet.</div>
       )}
 
-      <div className="detail-nav">
-        {prev ? (
-          <Link to={`${checklistPath}/item/${prev.id}`} className="detail-nav-link prev">
-            <IconChevronRight className="icon-16 flip" />
-            <span className="detail-nav-title">{prev.title}</span>
-          </Link>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <Link to={`${checklistPath}/item/${next.id}`} className="detail-nav-link next">
-            <span className="detail-nav-title">{next.title}</span>
-            <IconArrowRight className="icon-16" />
-          </Link>
-        ) : (
-          <span />
-        )}
-      </div>
+      {hasGpsFailure && (
+        <OverrideForm
+          onSave={(note) =>
+            setEvidence((list) =>
+              list.map((e) =>
+                e.gps === "failed" ? { ...e, overrideNote: note } : e
+              )
+            )
+          }
+        />
+      )}
     </main>
   );
 }
