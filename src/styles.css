@@ -1569,6 +1569,8 @@ a {
 
 .app-main {
   flex: 1;
+  /* Clip the horizontal page-transition slide so it never spawns a scrollbar. */
+  overflow-x: clip;
 }
 
 /* ---------- Projects page header ---------- */
