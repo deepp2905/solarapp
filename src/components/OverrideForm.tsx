@@ -18,7 +18,8 @@ export default function OverrideForm({ initialNote = "", onSave }: Props) {
   return (
     <section className="override">
       <h2 className="override-title">
-        Why is GPS unavailable or outside tolerance? (Required)
+        Why is GPS unavailable or outside tolerance?{" "}
+        <span className="override-required">(Required)</span>
       </h2>
 
       <textarea

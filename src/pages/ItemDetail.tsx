@@ -18,10 +18,14 @@ export default function ItemDetail() {
   const project = projectId ? findProject(projectId) : undefined;
   const found = project && itemId ? findItem(project, itemId) : null;
 
-  // local copy so override / delete can mutate without a backend
-  const [evidence, setEvidence] = useState<Evidence[]>(
-    found?.item.evidence ?? []
+  // local copy so override / delete can mutate without a backend.
+  // `uid` lets us track which freshly added tiles should show the loader.
+  type LocalEvidence = Evidence & { uid: number };
+  const uidRef = useRef(0);
+  const [evidence, setEvidence] = useState<LocalEvidence[]>(() =>
+    (found?.item.evidence ?? []).map((e) => ({ ...e, uid: uidRef.current++ }))
   );
+  const [loadingUids, setLoadingUids] = useState<Set<number>>(new Set());
 
   // Hidden inputs: one for library/browse, one that prefers the camera.
   const browseInputRef = useRef<HTMLInputElement>(null);
@@ -29,7 +33,8 @@ export default function ItemDetail() {
 
   function addFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
-    const added: Evidence[] = Array.from(fileList).map((file) => ({
+    const added: LocalEvidence[] = Array.from(fileList).map((file) => ({
+      uid: uidRef.current++,
       fileName: file.name,
       displayName: file.name,
       ready: true,
@@ -40,6 +45,20 @@ export default function ItemDetail() {
         : undefined,
     }));
     setEvidence((list) => [...list, ...added]);
+    setLoadingUids((s) => {
+      const next = new Set(s);
+      added.forEach((e) => next.add(e.uid));
+      return next;
+    });
+  }
+
+  function clearLoading(uid: number) {
+    setLoadingUids((s) => {
+      if (!s.has(uid)) return s;
+      const next = new Set(s);
+      next.delete(uid);
+      return next;
+    });
   }
 
   if (!project || !found) {
@@ -128,17 +147,17 @@ export default function ItemDetail() {
           <div className="dropzone-cta-row">
             <button
               type="button"
-              className="btn btn-take"
+              className="btn btn-take dropzone-cta"
               onClick={() => cameraInputRef.current?.click()}
             >
               <IconCamera className="icon-16" /> Take a picture
             </button>
             <button
               type="button"
-              className="btn-browse"
+              className="btn-browse dropzone-cta"
               onClick={() => browseInputRef.current?.click()}
             >
-              <IconImage className="icon-16" /> Upload from gallery
+              <IconImage className="icon-16" /> Upload files
             </button>
           </div>
         </div>
@@ -148,12 +167,14 @@ export default function ItemDetail() {
 
       {evidence.length > 0 && (
         <div className="evidence-grid">
-          {evidence.map((ev, i) => (
+          {evidence.map((ev) => (
             <EvidenceCard
-              key={ev.fileName + i}
+              key={ev.uid}
               evidence={ev}
+              loading={loadingUids.has(ev.uid)}
+              onLoaded={() => clearLoading(ev.uid)}
               onDelete={() =>
-                setEvidence((list) => list.filter((_, j) => j !== i))
+                setEvidence((list) => list.filter((e) => e.uid !== ev.uid))
               }
             />
           ))}

@@ -1,15 +1,35 @@
+import { useEffect } from "react";
 import type { Evidence } from "../data";
 import { IconImage, IconTrash } from "./Icon";
 
 interface Props {
   evidence: Evidence;
+  /** Show a skeleton loader (random 1–2s) — used for just-added images. */
+  loading?: boolean;
+  /** Called once the simulated load completes. */
+  onLoaded?: () => void;
   onDelete?: () => void;
 }
 
 /** A captured-evidence tile: image preview on top, status pills + filename below. */
-export default function EvidenceCard({ evidence, onDelete }: Props) {
+export default function EvidenceCard({
+  evidence,
+  loading,
+  onLoaded,
+  onDelete,
+}: Props) {
   const gpsFailed = evidence.gps === "failed";
   const resolved = Boolean(evidence.overrideNote);
+
+  // Simulate an upload/processing delay for freshly added images.
+  const showSkeleton = Boolean(loading);
+  useEffect(() => {
+    if (!loading) return;
+    const delay = 1000 + Math.random() * 1000; // 1–2s
+    const t = setTimeout(() => onLoaded?.(), delay);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   function handleDelete() {
     if (window.confirm("Delete this file? This can't be undone.")) {
@@ -22,13 +42,17 @@ export default function EvidenceCard({ evidence, onDelete }: Props) {
       <div
         className="evidence-preview"
         style={
-          evidence.thumbnailUrl
+          evidence.thumbnailUrl && !showSkeleton
             ? { backgroundImage: `url(${evidence.thumbnailUrl})` }
             : undefined
         }
       >
-        {!evidence.thumbnailUrl && (
-          <IconImage className="evidence-preview-icon" />
+        {showSkeleton ? (
+          <div className="evidence-skeleton" />
+        ) : (
+          !evidence.thumbnailUrl && (
+            <IconImage className="evidence-preview-icon" />
+          )
         )}
       </div>
 
