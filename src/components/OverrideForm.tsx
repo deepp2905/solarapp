@@ -31,10 +31,21 @@ export default function OverrideForm({ initialNote = "", onSave }: Props) {
 
   return (
     <section className="override">
-      <h2 className="override-title">
-        Why is GPS unavailable or outside tolerance?{" "}
-        <span className="override-required">(Required)</span>
-      </h2>
+      <div className="override-head">
+        <h2 className="override-title">
+          Why is GPS unavailable or outside tolerance?{" "}
+          <span className="override-required">(Required)</span>
+        </h2>
+
+        <button
+          type="button"
+          className={`btn-save ${saved ? "btn-browse" : "btn btn-take"}`}
+          disabled={!saved && !canSave}
+          onClick={handleClick}
+        >
+          {saved ? "Edit" : "Save"}
+        </button>
+      </div>
 
       <textarea
         className="override-input"
@@ -48,15 +59,6 @@ export default function OverrideForm({ initialNote = "", onSave }: Props) {
         tabIndex={saved ? -1 : 0}
         aria-readonly={saved}
       />
-
-      <button
-        type="button"
-        className="btn-browse btn-save"
-        disabled={!saved && !canSave}
-        onClick={handleClick}
-      >
-        {saved ? "Edit" : "Save"}
-      </button>
     </section>
   );
 }

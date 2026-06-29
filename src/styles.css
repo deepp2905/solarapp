@@ -1006,10 +1006,13 @@ a {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 16px;
+  /* No card padding: the image sits flush to the edges; padding for the
+     text below is applied on the meta block instead. */
+  padding: 0;
   /* Allow the card to shrink to its column so the filename ellipsizes
      instead of widening the track. */
   min-width: 0;
+  overflow: hidden;
 }
 
 
@@ -1018,7 +1021,7 @@ a {
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
-  border-radius: 8px;
+  /* Flush to the card edges; the card's overflow:hidden rounds the top corners. */
   background: var(--color-bg) center / cover no-repeat;
   display: flex;
   align-items: center;
@@ -1050,10 +1053,11 @@ a {
   }
 }
 
-/* Big rectangle filling the 1:1 preview box */
+/* Big rectangle filling the 1:1 preview box (flush, like the real image) */
 .skeleton-preview {
   width: 100%;
   height: 100%;
+  border-radius: 0;
 }
 
 /* Drop the centering/padding so the preview skeleton fills edge-to-edge */
@@ -1083,6 +1087,8 @@ a {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  /* Padding for the text area only; the image above stays flush. */
+  padding: 0 16px 16px;
   min-width: 0;
   flex: none;
 }
@@ -1242,8 +1248,24 @@ a {
   outline: none;
 }
 
+/* Title + Save/Edit on one row; button hugs the right edge */
+.override-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.override-head .override-title {
+  flex: 1;
+  min-width: 0;
+}
+
 .btn-save {
-  align-self: flex-start;
+  flex: none;
+  /* Keep both states (primary Save / secondary Edit) the same size */
+  padding: 11px 20px;
+  border-radius: 10px;
 }
 
 .btn-browse:disabled {

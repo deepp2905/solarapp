@@ -5,7 +5,7 @@ import ConfirmDialog from "./ConfirmDialog";
 
 interface Props {
   evidence: Evidence;
-  /** Show a skeleton loader (random 1–2s) — used for just-added images. */
+  /** Show a skeleton loader (random 2–5s) — used for just-added images. */
   loading?: boolean;
   /** Called once the simulated load completes. */
   onLoaded?: () => void;
@@ -26,7 +26,7 @@ export default function EvidenceCard({
   const showSkeleton = Boolean(loading);
   useEffect(() => {
     if (!loading) return;
-    const delay = 1000 + Math.random() * 1000; // 1–2s
+    const delay = 2000 + Math.random() * 3000; // 2–5s
     const t = setTimeout(() => onLoaded?.(), delay);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
