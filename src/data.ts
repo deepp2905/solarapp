@@ -293,22 +293,39 @@ function resolveCapturedEvidence(item: ChecklistItem): void {
   });
 }
 
-// Mark the first `fraction` of a section list's items as captured.
+// A single passing placeholder photo, used to seed a captured item that has no
+// pre-authored evidence so its derived status is "captured".
+function placeholderEvidence(): Evidence {
+  return {
+    fileName: "site-photo.jpg",
+    displayName: "site-photo.jpg",
+    ready: true,
+    gps: "ok",
+  };
+}
+
+// Seed the first `fraction` of a section list's items as captured by giving
+// them evidence; the rest are left empty (Pending). Status is then *derived*
+// from evidence so the seed always satisfies the capture rules
+// (see deriveItemStatus): no item is left Pending while holding photos, and no
+// captured item carries an unresolved GPS failure.
 function seedProgress(sections: Section[], fraction: number): Section[] {
   const items = sections.flatMap((s) => s.items);
   const target = Math.round(items.length * fraction);
   items.forEach((item, i) => {
     if (i < target) {
-      item.status = "captured";
-      item.filesCaptured = item.filesCaptured ?? 1;
+      // Captured: ensure it has at least one photo, and excuse any failures.
+      if (!item.evidence || item.evidence.length === 0) {
+        item.evidence = [placeholderEvidence()];
+      }
       resolveCapturedEvidence(item);
     } else {
-      // ensure anything pre-seeded as captured beyond target is reset
-      if (item.status === "captured") {
-        item.status = "to-capture";
-        delete item.filesCaptured;
-      }
+      // Pending: clear any pre-authored evidence so it derives to "to-capture".
+      delete item.evidence;
+      delete item.filesCaptured;
     }
+    item.status = deriveItemStatus(item.evidence);
+    item.filesCaptured = item.evidence?.length;
   });
   return sections;
 }
@@ -345,7 +362,7 @@ export function projectStatusCounts(
   return order
     .map((status) => ({
       status,
-      count: projects.filter((p) => p.status === status).length,
+      count: projects.filter((p) => deriveProjectStatus(p) === status).length,
     }))
     .filter((s) => s.count > 0);
 }
@@ -366,6 +383,20 @@ export function capturedItems(project: Project): number {
   return flatItems(project).filter((i) => i.status === "captured").length;
 }
 
+/**
+ * Project status derived from item completion:
+ *  - 0 captured            → "not-started"
+ *  - all items captured    → "complete"
+ *  - otherwise             → "in-progress"
+ */
+export function deriveProjectStatus(project: Project): ProjectStatus {
+  const total = totalItems(project);
+  const done = capturedItems(project);
+  if (done === 0) return "not-started";
+  if (done === total) return "complete";
+  return "in-progress";
+}
+
 /** Captured count within a single section. */
 export function sectionCaptured(section: Section): number {
   return section.items.filter((i) => i.status === "captured").length;
@@ -384,12 +415,31 @@ export function itemStatusLabel(item: ChecklistItem): string {
         ? `${item.filesCaptured} file${item.filesCaptured === 1 ? "" : "s"} captured`
         : "Captured";
     case "error":
-      return "GPS check failed";
+      return "GPS Failed!";
     case "warning":
       return "Needs review";
     default:
       return "Pending";
   }
+}
+
+/**
+ * Derive an item's status from its evidence, per the capture rules:
+ *  - no images                                   → "to-capture" (Pending)
+ *  - any image with a GPS failure not yet excused
+ *    by a saved override note                    → "error" (GPS Failed!)
+ *  - otherwise (has images, all failures excused
+ *    or none failed)                             → "captured" (Completed)
+ *
+ * A failed GPS photo is "excused" once an override reason is saved onto it
+ * (`overrideNote`), which flips the item back to captured.
+ */
+export function deriveItemStatus(evidence: Evidence[] = []): ItemStatus {
+  if (evidence.length === 0) return "to-capture";
+  const unresolvedFailure = evidence.some(
+    (e) => e.gps === "failed" && !e.overrideNote
+  );
+  return unresolvedFailure ? "error" : "captured";
 }
 
 export function findItem(project: Project, itemId: string) {

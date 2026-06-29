@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { findItem, findProject, type Evidence } from "../data";
+import { deriveItemStatus, findItem, type Evidence } from "../data";
+import { useProject, useProjects } from "../store";
 import EvidenceCard from "../components/EvidenceCard";
 import OverrideForm from "../components/OverrideForm";
 import {
@@ -15,17 +16,36 @@ export default function ItemDetail() {
     projectId: string;
     itemId: string;
   }>();
-  const project = projectId ? findProject(projectId) : undefined;
+  const project = useProject(projectId);
+  const { setItemEvidence } = useProjects();
   const found = project && itemId ? findItem(project, itemId) : null;
 
   // local copy so override / delete can mutate without a backend.
   // `uid` lets us track which freshly added tiles should show the loader.
   type LocalEvidence = Evidence & { uid: number };
   const uidRef = useRef(0);
-  const [evidence, setEvidence] = useState<LocalEvidence[]>(() =>
+  const [evidence, setEvidenceState] = useState<LocalEvidence[]>(() =>
     (found?.item.evidence ?? []).map((e) => ({ ...e, uid: uidRef.current++ }))
   );
   const [loadingUids, setLoadingUids] = useState<Set<number>>(new Set());
+
+  // Wraps the local state setter so every evidence change is also pushed to the
+  // shared store (stripping the local-only `uid`), keeping the checklist and
+  // project cards in sync with edits made here.
+  function setEvidence(
+    update: (list: LocalEvidence[]) => LocalEvidence[]
+  ) {
+    setEvidenceState((list) => {
+      const next = update(list);
+      if (projectId && itemId) {
+        const stripped = next.map(({ uid: _uid, ...rest }) => rest);
+        // Defer the store write so it doesn't run inside the reducer (which
+        // StrictMode invokes twice) — schedule it after this commit.
+        queueMicrotask(() => setItemEvidence(projectId, itemId, stripped));
+      }
+      return next;
+    });
+  }
 
   // Hidden inputs: one for library/browse, one that prefers the camera.
   const browseInputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +93,14 @@ export default function ItemDetail() {
 
   const { item } = found;
   const checklistPath = `/project/${project.id}`;
+  // Live status derived from the local evidence (see deriveItemStatus rules):
+  // any GPS failure without a saved reason → "error" (GPS Failed!).
+  const liveStatus = deriveItemStatus(evidence);
+  // Show the override form whenever a GPS failure exists at all (resolved or
+  // not) so the saved reason stays editable; the "GPS Failed!" pill, however,
+  // only shows while the failure is unresolved.
   const hasGpsFailure = evidence.some((e) => e.gps === "failed");
+  const showGpsFailedPill = liveStatus === "error";
 
   return (
     <main className="page detail-page">
@@ -85,8 +112,8 @@ export default function ItemDetail() {
       <header className="detail-heading">
         <div className="detail-title-row">
           <h1 className="detail-title">{item.title}</h1>
-          {item.status === "error" && (
-            <span className="pill pill-error-soft">GPS failed</span>
+          {showGpsFailedPill && (
+            <span className="pill pill-error-soft">GPS Failed</span>
           )}
         </div>
         <p className="detail-subtitle">{item.subtitle}</p>
@@ -183,6 +210,10 @@ export default function ItemDetail() {
 
       {hasGpsFailure && (
         <OverrideForm
+          initialNote={
+            evidence.find((e) => e.gps === "failed" && e.overrideNote)
+              ?.overrideNote ?? ""
+          }
           onSave={(note) =>
             setEvidence((list) =>
               list.map((e) =>

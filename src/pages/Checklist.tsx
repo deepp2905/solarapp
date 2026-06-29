@@ -2,19 +2,19 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   capturedItems,
-  findProject,
   itemStatusLabel,
   sectionCaptured,
   sectionNeedsAttention,
   totalItems,
 } from "../data";
+import { useProject } from "../store";
 import StatusIcon from "../components/StatusIcon";
 import ProjectHeader from "../components/ProjectHeader";
 import { IconChevron, IconChevronRight } from "../components/Icon";
 
 export default function Checklist() {
   const { projectId } = useParams<{ projectId: string }>();
-  const project = projectId ? findProject(projectId) : undefined;
+  const project = useProject(projectId);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const toggle = (id: string) =>

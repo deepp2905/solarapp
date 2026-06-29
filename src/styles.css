@@ -1153,9 +1153,9 @@ a {
   border-radius: 999px;
   padding: 3px 10px;
   white-space: nowrap;
-  /* Sentence case, regular weight — overrides the shared .pill type rule above */
+  /* Sentence case, medium weight — overrides the shared .pill type rule above */
   text-transform: none;
-  font-weight: var(--fw-regular);
+  font-weight: var(--fw-medium);
 }
 
 .pill-icon {

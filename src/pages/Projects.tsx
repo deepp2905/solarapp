@@ -1,16 +1,18 @@
 import { useMemo, useState } from "react";
-import { PROJECTS, PROJECT_STATUS_ORDER } from "../data";
+import { deriveProjectStatus, PROJECT_STATUS_ORDER } from "../data";
+import { useProjects } from "../store";
 import ProjectsHeader from "../components/ProjectsHeader";
 import ProjectFilters from "../components/ProjectFilters";
 import ProjectCard from "../components/ProjectCard";
 
 export default function Projects() {
+  const { projects: PROJECTS } = useProjects();
   const [query, setQuery] = useState("");
   const [ahj, setAhj] = useState("all");
 
   const jurisdictions = useMemo(
     () => [...new Set(PROJECTS.map((p) => p.ahj))].sort(),
-    []
+    [PROJECTS]
   );
 
   const filtered = useMemo(() => {
@@ -25,9 +27,10 @@ export default function Projects() {
       return matchesAhj && matchesQuery;
     }).sort(
       (a, b) =>
-        PROJECT_STATUS_ORDER[a.status] - PROJECT_STATUS_ORDER[b.status]
+        PROJECT_STATUS_ORDER[deriveProjectStatus(a)] -
+        PROJECT_STATUS_ORDER[deriveProjectStatus(b)]
     );
-  }, [query, ahj]);
+  }, [PROJECTS, query, ahj]);
 
   return (
     <main className="page">

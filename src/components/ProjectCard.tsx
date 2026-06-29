@@ -1,5 +1,10 @@
 import { Link } from "react-router-dom";
-import { capturedItems, totalItems, type Project } from "../data";
+import {
+  capturedItems,
+  deriveProjectStatus,
+  totalItems,
+  type Project,
+} from "../data";
 import StatusBadge from "./StatusBadge";
 
 export default function ProjectCard({ project }: { project: Project }) {
@@ -10,7 +15,7 @@ export default function ProjectCard({ project }: { project: Project }) {
   return (
     <Link to={`/project/${project.id}`} className="project-card">
       <div className="project-card-top">
-        <StatusBadge status={project.status} />
+        <StatusBadge status={deriveProjectStatus(project)} />
       </div>
 
       <div className="project-card-body">
