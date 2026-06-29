@@ -242,6 +242,13 @@ export default function ItemDetail() {
 
       {hasGpsFailure && (
         <OverrideForm
+          toleranceMi={project.gpsToleranceMi}
+          failures={evidence
+            .filter((e) => e.gps === "failed")
+            .map((e) => ({
+              displayName: e.displayName,
+              distanceMi: e.distanceMi,
+            }))}
           initialNote={
             evidence.find((e) => e.gps === "failed" && e.overrideNote)
               ?.overrideNote ?? ""
