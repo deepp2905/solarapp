@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { PROJECTS } from "../data";
+import { PROJECTS, PROJECT_STATUS_ORDER } from "../data";
 import ProjectsHeader from "../components/ProjectsHeader";
 import ProjectFilters from "../components/ProjectFilters";
 import ProjectCard from "../components/ProjectCard";
@@ -23,7 +23,10 @@ export default function Projects() {
         p.address.toLowerCase().includes(q) ||
         p.ahj.toLowerCase().includes(q);
       return matchesAhj && matchesQuery;
-    });
+    }).sort(
+      (a, b) =>
+        PROJECT_STATUS_ORDER[a.status] - PROJECT_STATUS_ORDER[b.status]
+    );
   }, [query, ahj]);
 
   return (

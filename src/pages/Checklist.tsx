@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { capturedItems, findProject, totalItems } from "../data";
+import {
+  capturedItems,
+  findProject,
+  itemStatusLabel,
+  sectionCaptured,
+  sectionNeedsAttention,
+  totalItems,
+} from "../data";
 import StatusIcon from "../components/StatusIcon";
 import ProjectHeader from "../components/ProjectHeader";
-import { IconChevron } from "../components/Icon";
+import { IconChevron, IconChevronRight } from "../components/Icon";
 
 export default function Checklist() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -25,6 +32,13 @@ export default function Checklist() {
 
   return (
     <main className="page">
+      <nav className="breadcrumb">
+        <Link to="/" className="crumb crumb-back">
+          <IconChevronRight className="crumb-back-icon" />
+          All projects
+        </Link>
+      </nav>
+
       <ProjectHeader
         name={project.name}
         address={project.address}
@@ -34,9 +48,8 @@ export default function Checklist() {
 
       <div className="sections">
         {project.sections.map((section) => {
-          const done = section.items.filter(
-            (i) => i.status === "captured"
-          ).length;
+          const done = sectionCaptured(section);
+          const needsAttention = sectionNeedsAttention(section);
           const isCollapsed = collapsed[section.id];
           return (
             <div
@@ -47,41 +60,38 @@ export default function Checklist() {
                 type="button"
                 className="section-head"
                 onClick={() => toggle(section.id)}
+                aria-expanded={!isCollapsed}
               >
-                <span className="section-title">{section.title}</span>
-                <span className="section-meta">
-                  {done} of {section.items.length} complete
-                  <IconChevron className="chevron" />
+                <span className="section-head-left">
+                  <IconChevron className="section-chevron" />
+                  <span className="section-title">{section.title}</span>
+                  {needsAttention && (
+                    <span className="section-badge">Needs attention</span>
+                  )}
+                </span>
+                <span className="section-count">
+                  {done} of {section.items.length}
                 </span>
               </button>
 
-              {section.items.map((item) => (
-                <Link
-                  key={item.id}
-                  className="item-row"
-                  to={`/project/${project.id}/item/${item.id}`}
-                >
-                  <span className="item-left">
+              <div className="section-items">
+                {section.items.map((item) => (
+                  <Link
+                    key={item.id}
+                    className="item-row"
+                    to={`/project/${project.id}/item/${item.id}`}
+                  >
                     <StatusIcon status={item.status} />
-                    <span>
+                    <span className="item-text">
                       <span className="item-title">{item.title}</span>
-                      {item.status === "captured" && (
-                        <div className="item-files">
-                          {item.filesCaptured} files captured
-                        </div>
-                      )}
+                      <span className={`item-sub item-sub--${item.status}`}>
+                        {itemStatusLabel(item)}
+                      </span>
                     </span>
-                  </span>
-
-                  {item.status === "captured" ? (
-                    <span className="thumb">IMG</span>
-                  ) : item.status === "error" ? (
-                    <span className="badge badge-error">GPS failed</span>
-                  ) : (
-                    <span className="badge">To capture</span>
-                  )}
-                </Link>
-              ))}
+                    <IconChevronRight className="item-caret" />
+                  </Link>
+                ))}
+              </div>
             </div>
           );
         })}

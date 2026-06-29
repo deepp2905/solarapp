@@ -16,7 +16,7 @@ export default function ProjectsHeader({ projects, onAddProject }: Props) {
   return (
     <header className="projects-header">
       <div className="projects-heading">
-        <h1 className="page-title">Projects</h1>
+        <h1 className="page-title">All Projects</h1>
         <div className="projects-summary">
           {counts.map(({ status, count }, i) => (
             <span key={status} className="projects-summary-item">

@@ -255,6 +255,8 @@ function buildSectionsWithExtra(): Section[] {
 
 // Demo project definitions. `sections` is built per project so each owns an
 // independent checklist; `buildSectionsWithExtra` gives one a differing count.
+// `progress` (0–1) seeds how many items start captured, so card progress
+// bars/percentages stay derived from real item state — not hardcoded.
 interface ProjectSeed {
   id: string;
   name: string;
@@ -262,25 +264,48 @@ interface ProjectSeed {
   type: string;
   ahj: string;
   status: ProjectStatus;
+  progress: number;
   withExtra?: boolean;
 }
 
 const PROJECT_SEEDS: ProjectSeed[] = [
-  { id: "sample-project", name: "Sample Project", address: "350 California Street, San Francisco, CA", type: "ST", ahj: "City of Santa Clara", status: "in-progress" },
-  { id: "mission-st-retrofit", name: "Mission St Retrofit", address: "350 Mission Street, San Francisco, CA", type: "ST", ahj: "City of Milpitas", status: "in-progress", withExtra: true },
-  { id: "harborview-solar", name: "Harborview Solar", address: "88 Embarcadero, San Francisco, CA", type: "PV", ahj: "City of Oakland", status: "in-progress" },
-  { id: "redwood-commons", name: "Redwood Commons", address: "1200 Broadway, Redwood City, CA", type: "PV", ahj: "City of Santa Clara", status: "complete" },
-  { id: "sunset-ridge", name: "Sunset Ridge", address: "45 Ocean Ave, San Francisco, CA", type: "ST", ahj: "City of San Jose", status: "complete" },
-  { id: "lakeside-array", name: "Lakeside Array", address: "9 Lakeshore Dr, Oakland, CA", type: "PV", ahj: "City of Oakland", status: "complete" },
-  { id: "summit-battery", name: "Summit Battery", address: "500 Summit Rd, San Jose, CA", type: "ST", ahj: "City of San Jose", status: "complete" },
-  { id: "bayfront-install", name: "Bayfront Install", address: "12 Bay St, Milpitas, CA", type: "PV", ahj: "City of Milpitas", status: "not-started" },
+  { id: "sample-project", name: "Sample Project", address: "350 California Street, San Francisco, CA", type: "ST", ahj: "City of Santa Clara", status: "in-progress", progress: 0.12 },
+  { id: "mission-st-retrofit", name: "Mission St Retrofit", address: "350 Mission Street, San Francisco, CA", type: "ST", ahj: "City of Milpitas", status: "in-progress", progress: 0.45, withExtra: true },
+  { id: "harborview-solar", name: "Harborview Solar", address: "88 Embarcadero, San Francisco, CA", type: "PV", ahj: "City of Oakland", status: "in-progress", progress: 0.78 },
+  { id: "redwood-commons", name: "Redwood Commons", address: "1200 Broadway, Redwood City, CA", type: "PV", ahj: "City of Santa Clara", status: "complete", progress: 1 },
+  { id: "sunset-ridge", name: "Sunset Ridge", address: "45 Ocean Ave, San Francisco, CA", type: "ST", ahj: "City of San Jose", status: "complete", progress: 1 },
+  { id: "lakeside-array", name: "Lakeside Array", address: "9 Lakeshore Dr, Oakland, CA", type: "PV", ahj: "City of Oakland", status: "complete", progress: 1 },
+  { id: "summit-battery", name: "Summit Battery", address: "500 Summit Rd, San Jose, CA", type: "ST", ahj: "City of San Jose", status: "complete", progress: 1 },
+  { id: "bayfront-install", name: "Bayfront Install", address: "12 Bay St, Milpitas, CA", type: "PV", ahj: "City of Milpitas", status: "not-started", progress: 0 },
 ];
 
+// Mark the first `fraction` of a section list's items as captured.
+function seedProgress(sections: Section[], fraction: number): Section[] {
+  const items = sections.flatMap((s) => s.items);
+  const target = Math.round(items.length * fraction);
+  items.forEach((item, i) => {
+    if (i < target) {
+      item.status = "captured";
+      item.filesCaptured = item.filesCaptured ?? 1;
+    } else {
+      // ensure anything pre-seeded as captured beyond target is reset
+      if (item.status === "captured") {
+        item.status = "to-capture";
+        delete item.filesCaptured;
+      }
+    }
+  });
+  return sections;
+}
+
 export const PROJECTS: Project[] = PROJECT_SEEDS.map(
-  ({ withExtra, ...seed }) => ({
+  ({ withExtra, progress, ...seed }) => ({
     ...seed,
     gpsToleranceMi: 0.1,
-    sections: withExtra ? buildSectionsWithExtra() : buildSections(),
+    sections: seedProgress(
+      withExtra ? buildSectionsWithExtra() : buildSections(),
+      progress
+    ),
   })
 );
 
@@ -288,6 +313,13 @@ export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
   complete: "Complete",
   "in-progress": "In progress",
   "not-started": "Not started",
+};
+
+/** Default card sort priority: not started → in progress → complete. */
+export const PROJECT_STATUS_ORDER: Record<ProjectStatus, number> = {
+  "not-started": 0,
+  "in-progress": 1,
+  complete: 2,
 };
 
 /** Counts of projects per status, in display order (complete → in-progress → not-started). */
@@ -317,6 +349,32 @@ export function totalItems(project: Project): number {
 
 export function capturedItems(project: Project): number {
   return flatItems(project).filter((i) => i.status === "captured").length;
+}
+
+/** Captured count within a single section. */
+export function sectionCaptured(section: Section): number {
+  return section.items.filter((i) => i.status === "captured").length;
+}
+
+/** A section needs attention if any of its items is in an error state. */
+export function sectionNeedsAttention(section: Section): boolean {
+  return section.items.some((i) => i.status === "error");
+}
+
+/** Short status sub-label shown under an item's title on the checklist. */
+export function itemStatusLabel(item: ChecklistItem): string {
+  switch (item.status) {
+    case "captured":
+      return item.filesCaptured
+        ? `${item.filesCaptured} file${item.filesCaptured === 1 ? "" : "s"} captured`
+        : "Captured";
+    case "error":
+      return "GPS check failed";
+    case "warning":
+      return "Needs review";
+    default:
+      return "Pending";
+  }
 }
 
 export function findItem(project: Project, itemId: string) {

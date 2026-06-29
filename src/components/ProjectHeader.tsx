@@ -7,7 +7,7 @@ interface Props {
   onReview?: () => void;
 }
 
-/** Sticky project header shown beneath the nav on the checklist. */
+/** Project header card: name, address, then progress + Review action. */
 export default function ProjectHeader({
   name,
   address,
@@ -15,22 +15,22 @@ export default function ProjectHeader({
   total,
   onReview,
 }: Props) {
-  const pct = total > 0 ? (completed / total) * 100 : 0;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   const canReview = completed === total;
 
   return (
-    <div className="project-header">
-      <h1 className="project-name">{name}</h1>
-      <p className="project-address">{address}</p>
+    <section className="project-header">
+      <div className="project-header-info">
+        <h1 className="project-name">{name}</h1>
+        <p className="project-address">{address}</p>
+      </div>
 
       <div className="project-header-row">
-        <div className="progress-wrap">
+        <div className="project-header-progress">
           <div className="progress-track">
             <div className="progress-fill" style={{ width: `${pct}%` }} />
           </div>
-          <span className="progress-count">
-            {completed}/{total}
-          </span>
+          <span className="project-header-pct">{pct}%</span>
         </div>
 
         <button
@@ -42,6 +42,6 @@ export default function ProjectHeader({
           Review &amp; Sign Off
         </button>
       </div>
-    </div>
+    </section>
   );
 }
