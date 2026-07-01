@@ -537,19 +537,6 @@ export function siblingItems(
   };
 }
 
-export function statusIconId(status: ItemStatus): string {
-  switch (status) {
-    case "captured":
-      return "icon-check";
-    case "warning":
-      return "icon-warning";
-    case "error":
-      return "icon-error";
-    default:
-      return "icon-dashed";
-  }
-}
-
 export function statusClass(status: ItemStatus): string {
   switch (status) {
     case "captured":

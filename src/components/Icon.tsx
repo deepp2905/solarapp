@@ -112,32 +112,6 @@ export const IconChevron = ({ className }: Props) => (
   </svg>
 );
 
-export const IconArrowLeft = ({ className }: Props) => (
-  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-    <path
-      d="M15 6l-6 6 6 6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-export const IconArrowRight = ({ className }: Props) => (
-  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-    <path
-      d="M9 6l6 6-6 6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export const IconCamera = ({ className }: Props) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
     <path
@@ -176,39 +150,6 @@ export const IconImage = ({ className }: Props) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-  </svg>
-);
-
-export const IconPin = ({ className }: Props) => (
-  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-    <path
-      d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinejoin="round"
-    />
-    <circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" strokeWidth="2" />
-  </svg>
-);
-
-export const IconGpsOff = ({ className }: Props) => (
-  <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-    <path
-      d="M12 21s7-5.5 7-11a7 7 0 0 0-1.2-3.9"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M15.5 4.2A7 7 0 0 0 5 10c0 3 2 6 4 8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinejoin="round"
-    />
-    <line x1="4" y1="3" x2="20" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 
